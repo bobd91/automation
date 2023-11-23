@@ -8,24 +8,6 @@ TODO: gpio mask for setting all led states in one go?
 static led_button_t *buttons;
 static repeating_timer_t blink_timer;
 
-static void button_callback(uint gpio, uint32_t event_mask) {
-    led_button_t *button = find_button(gpio);
-    if(event_mask & GPIO_IRQ_EDGE_RISE) {
-        if(button->button_pressed) *button->button_pressed(button);
-    } else if(event_mask & GPIO_IRQ_EDGE_FALL) {
-        if(button->released) *button->button_relased(button);
-    }
-}
-
-static led_button_t *find_button(uint gpio) {
-    led_button_t *button = buttons;
-    while(button) {
-        if(button->button_pin == gpio) return button;
-        button = button->next;
-    }
-    halt();
-}
-
 static void stop_blinking(void) {
     led_button_set_all(false);
     cancel_repeating_timer(&blink_timer);
@@ -60,10 +42,11 @@ static bool toggle_next_button(repeating_timer_t *blink_timer) {
 } 
 
 static void enable_button(led_button_t button) {
-    gpiopin_set_in(led_button->button_pin, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, button_callback);
+    gpiopin_set_in_enabled(led_button->button_pin, true);
 }
 
 void led_button_add(led_button_t *led_button) {
+    gpiopin_set_in(led_button->button_pin, led_button->button_pressed, led_button->button_released);
     gpiopin_set_out(led_button->led_pin);
     led_button->next = buttons;
     buttons = led_button->next;

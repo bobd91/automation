@@ -1,19 +1,20 @@
 #ifndef _COMMAND_H
 #define _COMMAND_H
 
+#include "async_event.h"
+
 #define COMMAND_SIZE 4;
 
-stuct command_s {
-    command_t *next,
+stuct command {
+    command *next,
     char[1 + COMMAND_SIZE] name,
-    command_handler_t handler
+    async_event_handler event_handler
 };
 
-typedef command_t struct command_s;
-typedef void (* command_handler_t)(char *buf);
+typedef struct command command;
 
 void command_init(void);
+void command_add(command *cmd);
 void command_dispatch(char *buf);
-void command_add(command_t *command);
 
 #endif

@@ -1,8 +1,8 @@
-#ifndef _GPIO_DETECTOR_H
-#define _GPIO_DETECTOR_H
+#ifndef _GPIO_SENSOR_H
+#define _GPIO_SENSOR_H
 
 #include "gpiopin.h"
 
-void gpio_detector_init(gpiopin_t pin);
+void gpio_sensor_enable(gpiopin_t pin);
 
 #endif

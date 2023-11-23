@@ -1,7 +1,7 @@
 #include <stdbool.h>
+#include <memory.h>
 #include "pico/async_context.h"
-#include "hardware/watchdog.h"
-#include "event.h"
+#include "async_event.h"
 #include "async.h"
 
 
@@ -40,11 +40,13 @@ static void enqueue_event(async_event_handler handler, char *arg) {
         event_queue[queue_tail].handler = handler;
         event_queue[queue_tail].arg = arg;
     }
+    async_set_work_pending(event_worker);
 }
 
 static bool queue_is_empty() {
     return queue_tail < queue_head;
 }
+
 static async_event *dequeue_event() {
     if(queue_is_empty()) return NULL;
 
@@ -72,7 +74,6 @@ static void process_event(async_when_pending_worker_t worker) {
 void async_event(async_event_handler handler, char *arg) {
     init();
     enqueue_event(handler, arg);
-    async_set_work_pending(event_worker);
 }
 
 void async_event_start(char *arg) {
