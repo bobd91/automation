@@ -1,108 +1,25 @@
 #include "led_button.h"
 #include "gpiopin.h"
-#include "pico/time.h"
 
-/*
-TODO: gpio mask for setting all led states in one go?
-*/
-static led_button_t *buttons;
-static repeating_timer_t blink_timer;
-
-static void stop_blinking(void) {
-    led_button_set_all(false);
-    cancel_repeating_timer(&blink_timer);
-}
-
-static void start_blinking(repeating_timer_callback_t matcher, led_button_t *led_button, uint32_t ms) {
-    led_button_set_all(false);
-    halt_if(!add_repeating_timer_ms(ms, matcher, led_button, &blink_timer));
-}
-
-static bool toggle_only_button(repeating_timer_t *blink_timer) {
-    led_button_t *button = blink_timer->user_data;
-    led_button_toggle(button);
-    return true;
-}
-
-static bool toggle_all_buttons(repeatimg_timer_t *blink_timer) {
-    led_button_t *button = buttons;
-    while(button) {
-        led_button_toggle(button);
-        button = button->next;
-    }
-    return true;
-}
-
-static bool toggle_next_button(repeating_timer_t *blink_timer) {
-    led_button *button = blink_timer->user_data;
-    if(!led_button_toggle(button)) {
-        blink_timer->user_data = button->next ? button->next : buttons;
-    }
-    return true;
-} 
-
-static void enable_button(led_button_t button) {
+static void enable_button(led_button_info *led_button) {
     gpiopin_set_in_enabled(led_button->button_pin, true);
 }
 
-void led_button_add(led_button_t *led_button) {
-    gpiopin_set_in(led_button->button_pin, led_button->button_pressed, led_button->button_released);
-    gpiopin_set_out(led_button->led_pin);
-    led_button->next = buttons;
-    buttons = led_button->next;
-}
 
-void led_button_set(led_button_t *led_button, bool on) {
+void led_button_set(led_button_info *led_button, bool on) {
     gpiopin_put(led_button->led_pin, on);
 }
 
-void led_button_enable_all() {
-    stop_blinking();
-    led_button_t *button = buttons;
-    while(button) {
-        enable_button(button);
-        led_button_set(button, button->initial_state);
-        button = button->next;
-    }
-}
 
-bool led_button_is_on(led_button_t *led_button) {
+bool led_button_is_on(led_button_info *led_button) {
     return gpiopin_get_out_level(led_button->led_pin);
 }
 
-bool led_button_toggle(led_button_t *led_button) {
+bool led_button_infooggle(led_button_info *led_button) {
     led_button_set(!led_button_is_on());
 }
 
-void led_button_on_only(led_button_t *led_button) {
-    stop_blinking();
-    led_button_t *button = buttons;
-    while(button) {
-        led_button_set(button, button == led_button);
-        button = button->next;
-    }
-}
-
-void led_button_set_all(bool on) {
-    stop_blinking();
-    led_button_t *button = buttons;
-    while(button) {
-        led_button_set(button, on);
-        button = button->next;
-    }
-}
-
-void led_button_blink_only(led_button_t *button, uint32_t ms) {
-    led_button_set_all(false);
-    start_blinking(toggle_only_button, button, ms);
-}
-
-void led_button_blink_all(uint32_t ms) {
-    led_button_set_all(false);
-    start_blinking(toggle_all_buttons, buttons, ms);
-}
-
-void led_button_blink_loop(uint32_t ms) {
-    led_button_set_all(false);
-    start_blinking(toggle_next_button, buttons, ms);
+led_button_info *led_button_new(gpiopin button_pin, gpiopin led_pin, led_button_event button_pressed) {
+    gpiopin_set_in(button_pin, button_pressed, NULL);
+    gpiopin_set_out(led_pin);
 }

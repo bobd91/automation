@@ -3,6 +3,6 @@
 
 #include "gpiopin.h"
 
-void gpio_sensor_enable(gpiopin_t pin);
+void gpio_sensor_setpin(gpiopin pin);
 
 #endif

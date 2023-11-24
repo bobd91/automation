@@ -4,9 +4,8 @@
 #define error_if(test, ret, fmt, ...) \
 do { \
   if(test) { \
-    typeof (ret) ret_ = (ret); \
-    error_event((fmt) __VA_OPT__(,) __VA_ARGS__, ret_); \
-    return ret_; \
+    error_event((fmt) __VA_OPT__(,) __VA_ARGS___); \
+    return ret; \
   } \
 } while(0)
 

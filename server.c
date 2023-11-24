@@ -22,7 +22,7 @@ static err_t connected(void *arg, struct tcp_pcb *tpcb, err_t err) {
     // errors go to error callback so safe to assume OK
     // https://www.nongnu.org/lwip/2_1_x/tcp_8h.html#a939867106bd492caf2d85852fb7f6ae8
 
-    event_async(ASYNC_EVENT_CONNECTED, NULL);
+    event_async_send(ASYNC_EVENT_SERVER_CONNECTED, NULL);
 
     return ERR_OK;
 }
@@ -80,38 +80,44 @@ err_t server_connect(char *server_ip, char *server_port) {
     err_t err = tcp_connect(tcp_state.tcp_pcb, &state.remote_addr, server_port, connected);
     cyw42_arch_lwip_end();
 
-    error_if(err != ERR_OK, err, "Server connection failed: %d");
+    error_if(err != ERR_OK, err, "Server connection failed: %d", err);
 
     return err;
+}
+
+static void server_send_arg(server_command cmd, char *arg) {
+    if(server_send(cmd, !arg) && arg) {
+        server_send(arg, true);
+    }
 }
 
 err_t server_send_identify(void) {
-    err_t err = server_send("IDFY", false);
-    if(err_t == ERR_OK) {
-        return server_send(id_string(), true);
-    }
-    return err;
+    server_send_arg(SERVER_COMMAND_IDENTIFY, id_string());
 }
 
 void server_send_turned_off(void) {
-    return server_send("TOFF", true);
+    server_send(SERVER_COMMAND_TURNED_OFF, true);
 }
 
 void server_send_turned_on(void) {
-    return server_send("TONN", true);
+    server_send(SERVER_COMMAND_TURNED_ON, true);
 }
 
-err_t server_send(const char *data, bool is_last) {
+void server_send_sensor_value(char *value) {
+    server_send_arg(SERVER_COMMAND_SENSOR_VALUE, value);
+}
+
+bool server_send(const char *data, bool is_last) {
     err_t err = tcp_write(tcp_state.tcp_pcb, data, strlen(data), is_last ? 0 : TCP_WRITE_FLAG_MORE);
-    error_if(err != ERR_OK, err, "TCP write error: %d");
+    error_if(err != ERR_OK, false, "TCP write error: %d", err);
 
     if(!is_last) {
         err = tcp_write(rcp_state.tcp_pcb, " ", 1, TCP_WRITE_FLAG_MORE);
-        error_if(err != ERR_OK, err, "TCP write error: %d");
+        error_if(err != ERR_OK, false, "TCP write error: %d", err);
     } else {
         err = tcp_output(tcp_state.tcp_pcb);
-        error_if(err != ERR_OK, err, "TCP output error: %d");
+        error_if(err != ERR_OK, false, "TCP output error: %d", err);
     }
 
-    return ERR_OK;
+    return true;
 }
