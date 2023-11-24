@@ -1,7 +1,6 @@
 #include "gpio_sensor.h"
 #include "async_event.h"
 #include "gpiopin.h"
-#include "control_panel.h"
 
 
 static void sensor_on(void) {

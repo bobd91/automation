@@ -4,3 +4,5 @@
 #include "gpiopin.h"
 
 void gpio_switch_setpin(gpiopin pin);
+
+#endif

@@ -1,5 +1,10 @@
 #include "app.h"
-
+#include "async.h"
+#include "async_event.h"
+#include "wifi.h"
+#include "server.h"
+#include "control_panel"
+#include "switch_action"
 
 static void app_init(void) {
     async_init();
@@ -7,7 +12,7 @@ static void app_init(void) {
     wifi_init(WIFI_SSID, WIFI_PASSWORD);
     server_init(SERVER_ADDRESS, SERVER_PORT);
     control_panel_init();
-    generic_switch_init();
+    switch_action_init();
 }
 
 void app_run(void) {

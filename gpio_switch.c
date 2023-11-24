@@ -1,5 +1,5 @@
 #include "gpio_switch.h"
-#include "generic_switch.h"
+#include "switch_action.h"
 #include "gpiopin.h"
 #include "async_event.h"
 
@@ -18,5 +18,5 @@ static void turn_on(void) {
 void gpio_switch_setpin(gpiopin pin) {
     switch_pin = pin;
     gpiopin_set_out(pin);
-    generic_switch_register(turn_off, turn_on);
+    switch_action_register(turn_off, turn_on);
 }

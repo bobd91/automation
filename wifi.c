@@ -1,6 +1,7 @@
 #include "wifi.h"
 #include "cyw43.h"
 #include "pico/cyw43_arch.h"
+#include "pico/time.h"
 
 static repeating_timer_t link_timer;
 
@@ -31,7 +32,7 @@ static bool check_link(repeating_timer_t *timer) {
 
     error_if(status < 0,false,"Wifi connection failed: %s", cyw43_tcpip_link_status_name(status));
 
-    if(status == CYM43_LINK_UP) {
+    if(status == CYW43_LINK_UP) {
         async_event_send(ASYNC_EVENT_WIFI_CONNECTED);
         return false;
     } else {

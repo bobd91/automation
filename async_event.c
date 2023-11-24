@@ -1,7 +1,8 @@
+#include "async_event.h"
 #include <stdbool.h>
 #include <memory.h>
+#include <string.h>
 #include "pico/async_context.h"
-#include "async_event.h"
 #include "async.h"
 
 
@@ -21,8 +22,10 @@ static struct event_listener_info {
 
 static typedef struct event_info event_info;
 
+// It is unlikely that there will be multiple events in the queue
+// If it reaches 10 then we have a problem
 static const queue_size = 10;
-static async_event_info event_queue[queue_size];
+static event_info event_queue[queue_size];
 static int queue_head = 0;
 static int queue_tail = -1;
 
@@ -131,30 +134,6 @@ void async_event_listen(async_event_id event_id, async_event_listener listener) 
 
 void async_event_listen_arg(async_event_id event_id, async_event_listener_arg listener_arg) {
     add_listener(event_id, NULL, listener_arg);
-}
-
-void async_event_start(char *arg) {
-    led_button_state_started();
-}
-
-void async_event_connected(char *arg) {
-    led_button_state_connected();
-}
-
-void async_event_identify(char *arg) {
-    led_button_state_identify();
-}
-
-void async_event_run(char *arg) {
-    led_button_state_run();
-}
-
-void async_event_turned_off(char *arg) {
-    server_send_turned_off();
-}
-
-void async_event_turned_on(char *arg) {
-    server_send_turned_on();
 }
 
 void async_event_error(char *arg) {
