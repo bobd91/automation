@@ -19,11 +19,11 @@ static const command commands[] = {
 },
 {
     .name = SERVER_COMMAND_TURN_OFF,
-    .event_id = ASYNC_EVENT_TURN_OFF
+    .event_id = ASYNC_EVENT_AUTO_TURN_OFF
 },
 {
     .name = SERVER_COMMAND_TURN_ON,
-    .event_id = ASYNC_EVENT_TURN_ON
+    .event_id = ASYNC_EVENT_AUTO_TURN_ON
 },
 {
     .name = SERVER_COMMAND_SENSOR_THRESHOLD,
@@ -60,7 +60,7 @@ void command_dispatch(char *buf) {
     }
     if(cmd->name) {
         char *arg = null_if_empty(skip_spaces(buf + cmd_size));
-        async_event_send(cmd->event_id, async_event_copy_arg(arg));
+        async_event_send_arg(cmd->event_id, async_event_copy_arg(arg));
     } else {
         handle_unknown(buf);
     }

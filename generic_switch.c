@@ -5,11 +5,11 @@ static async_event_listener when_turn_off = default_turn_off;
 static async_event_listener when_turn_on = default_turn_on;
 
 static void default_turn_off(void) {
-    async_event_send(ASYNC_EVENT_TURNED_OFF, NULL);
+    async_event_send(ASYNC_EVENT_TURNED_OFF);
 }
 
 static void default_turn_on(void) {
-    async_event_send(ASYNC_EVENT_TURNED_ON, NULL);
+    async_event_send(ASYNC_EVENT_TURNED_ON);
 }
 
 void generic_switch_register(async_event_listener turn_off, async_event_listener turn_on) {

@@ -5,15 +5,11 @@
 
 
 static void sensor_on(void) {
-    if(control_panel_is_auto_mode()) {
-        async_event_send(ASYNC_EVENT_TURN_ON, NULL);
-    }
+    async_event_send(ASYNC_EVENT_AUTO_TURN_ON);
 }
 
 static void sensor_off(void) {
-    if(control_panel_is_auto_mode()) {
-        async_event_send(ASYNC_EVENT_TURN_OFF, NULL);
-    }
+    async_event_send(ASYNC_EVENT_AUTO_TURN_OFF);
 } 
 
 void gpio_sensor_setpin(gpiopin pin) {

@@ -7,12 +7,12 @@ static gpiopin switch_pin;
 
 static void turn_off(void) {
     gpiopin_put(switch_pin, false);
-    async_event_send(ASYNC_EVENT_TURNED_OFF, NULL);
+    async_event_send(ASYNC_EVENT_TURNED_OFF);
 }
 
 static void turn_on(void) {
     gpiopin_put(switch_pin, true);
-    async_event_send(ASYNC_EVENT_TURNED_ON, NULL);
+    async_event_send(ASYNC_EVENT_TURNED_ON);
 }
 
 void gpio_switch_setpin(gpiopin pin) {

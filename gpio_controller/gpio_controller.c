@@ -10,5 +10,5 @@ void main(void) {
     control_panel_add_auto_button(AUTO_BUTTON_PIN, AUTO_LED_PIN);
     control_panel_add_on_button(ON_BUTTON_PIN, ON_LED_PIN);
 
-    async_event_send(ASYNC_EVENT_START, NULL);
+    app_run();
 }

@@ -62,12 +62,12 @@ static void process_buffer(tcp_state_t *state) {
     command_dispatch(state->buffer);
 }
 
-err_t server_connect(char *server_ip, char *server_port) {
+void server_connect(char *server_ip, char *server_port) {
     int ok = ip4addr_aton(server_ip, &tcp_state.remote_addr);
-    error_if(!ok, ERR_ARG, "Invalid IP address: %s", server_ip);
+    error_if(!ok,, "Invalid IP address: %s", server_ip);
     
     int port = atoi(server_port);
-    error_if(!port, ERR_ARG, "Invalid port number: %s", server_port);
+    error_if(!port,, "Invalid port number: %s", server_port);
 
     tcp_state.tcp_pcb = tcp_new_ip_type(IP_GET_TYPE(tcp_state.remote_addr));
 
@@ -80,9 +80,9 @@ err_t server_connect(char *server_ip, char *server_port) {
     err_t err = tcp_connect(tcp_state.tcp_pcb, &state.remote_addr, server_port, connected);
     cyw42_arch_lwip_end();
 
-    error_if(err != ERR_OK, err, "Server connection failed: %d", err);
+    error_if(err != ERR_OK,, "Server connection failed: %d", err);
 
-    return err;
+    return;
 }
 
 static void server_send_arg(server_command cmd, char *arg) {
@@ -91,7 +91,18 @@ static void server_send_arg(server_command cmd, char *arg) {
     }
 }
 
-err_t server_send_identify(void) {
+void server_init(char *ip, char *port) {
+    server_ip = ip;
+    server_port = port;
+
+    async_event_listen(ASYNC_EVENT_WIFI_CONNECTED, server_connect);
+    async_event_listen(ASYNC_EVENT_SERVER_CONNECTED, server_send_identify);
+    async_event_listen(ASYNC_EVENT_TURNED_OFF, server_send_turned_off);
+    async_event_listen(ASYNC_EVENT_TURNED_ON, server_send_turned_on);
+    async_event_listen_arg(ASYNC_EVENT_SENSOR_VALUE, server_send_sensor_value);
+}
+
+void server_send_identify(void) {
     server_send_arg(SERVER_COMMAND_IDENTIFY, id_string());
 }
 

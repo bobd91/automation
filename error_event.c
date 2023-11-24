@@ -21,5 +21,5 @@ void error_event(const char *fmt, ...) {
 
     va_end(argp);
 
-    async_event_send(ASYNC_EVENT_ERROR, buf);
+    async_event_send_arg(ASYNC_EVENT_ERROR, buf);
 }

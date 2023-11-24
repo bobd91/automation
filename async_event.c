@@ -32,12 +32,8 @@ static event_listener_info *listeners[ASYNC_EVENT_MAX_ID];
 
 static async_when_pending_worker_t event_worker = { .do_work = process_worker }
 
-static void init(void) {
-    static done; 
-    if(done) return;
-
+void async_event_init(void) {
     async_add_when_pending_worker(event_worker);
-    done = true;
 }
 
 static void enqueue_event(async_event_id event_id, char *arg) {
@@ -121,9 +117,12 @@ static void add_listener(async_event_id event_id, async_event_listener listener,
     listeners[event_id].info;
 }
 
-void async_event_send(async_event_id event_id, char *arg) {
-    init();
+void async_event_send_arg(async_event_id event_id, char *arg) {
     enqueue_event(event_id, arg);
+}
+
+void async_event_send(async_event_id event_id, char *arg) {
+    async_event_send_arg(event_id, NULL);
 }
 
 void async_event_listen(async_event_id event_id, async_event_listener listener) {
@@ -136,13 +135,10 @@ void async_event_listen_arg(async_event_id event_id, async_event_listener_arg li
 
 void async_event_start(char *arg) {
     led_button_state_started();
-    wifi_connect(WIFI_SSID, WIFI_PASSWORD, WIFI_TIMEOUT);
-    server_connect(SERVER_ADDRESS, SERVER_PORT);
 }
 
 void async_event_connected(char *arg) {
     led_button_state_connected();
-    server_send_identify();
 }
 
 void async_event_identify(char *arg) {
