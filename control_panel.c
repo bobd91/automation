@@ -8,8 +8,8 @@ static repeating_timer_t blink_timer;
 typedef void (* led_button_action)(led_button_info *led_button);
 
 // Assumption is that control panels
-// Will have one off button, one on button
-// And may have one auto button
+// Will have one "off" button, one "on" button
+// And may have one "auto" button
 static led_button_info *off_button;
 static led_button_info *auto_button;
 static led_button_info *on_button;
@@ -17,6 +17,10 @@ static led_button_info *on_button;
 static uint32_t blink_interval_ms;
 static bool auto_mode;
 static bool is_running;
+
+static const uint32_t flash_pause_ms = 120;
+static const uint32_t flash_long_pause_ms = 3 * flash_pause_ms;
+
 
 static led_button_info *next_led_button(led_button_info *led_button) {
     if(led_button == off_button) {
@@ -48,10 +52,6 @@ static void turn_led_on(led_button_info *led_button) {
     led_button_set(led_button, true);    
 }
 
-static void toggle_led(led_button_info *led_button) {
-    led_button_toggle(led_button);
-}
-
 static void turn_all_leds_off(void) {
     with_all_buttons(turn_led_off);
 }
@@ -66,7 +66,7 @@ static void stop_blinking(void) {
 }
 
 static void start_blinking(repeating_timer_callback_t matcher, led_button_info *led_button, uint32_t ms) {
-    turn_all_leds_off();
+    stop_blinking();
     error_if(!add_repeating_timer_ms(ms, matcher, led_button, &blink_timer),, ERROR_EVENT_ADD_TIMER, 0);
 }
 
@@ -77,7 +77,7 @@ static bool toggle_only_led(repeating_timer_t *blink_timer) {
 }
 
 static bool toggle_all_leds(repeatimg_timer_t *blink_timer) {
-    with_all_buttons(toggle_led);
+    with_all_buttons(led_button_toggle);
     return true;
 }
 
@@ -93,7 +93,7 @@ static void led_set_all(bool on) {
     stop_blinking();
     // All leds are now off, so to turn them on just toggle
     if(on) {
-        with_all_buttons(toggle_led);     
+        with_all_buttons(led_button_toggle);     
     }
 }
 
@@ -170,6 +170,42 @@ static void event_auto_turn_on(void) {
     if(auto_mode) {
         async_event_send(ASYNC_EVENT_TURN_ON);
     }
+}
+
+static uint32_t highest_set_bit(uint32_t num) {
+    if(!num) return 0;
+
+    uint32_t hsb = 1;
+    while(num /= 2) {
+        hsb *= 2;
+    }
+    return hsb;
+}
+
+static void flash_led(led_button_info *led_button, uint32_t pause_ms) {
+    turn_led_on(led_button);
+    sleep_ms(pause_ms);
+    turn_led_off(led_button);
+}
+
+static void flash_error_code(led_button_info *led_button, int error_code) {
+    // Don't want to be flashing negative numbers!
+    uint32_t code = (error_code >= 0) ? error_code : -error_code;
+
+    uint32_t hsb = highest_set_bit(code);
+    do {
+        flash_led(led_button, (code & hsb) ? flash_long_pause_ms : flash_pause_ms);
+        sleep_ms(flash_pause_ms);
+    } while(hsb /= 2);
+}
+
+static bool error_leds(event_error_id error_id, int extra) {
+    stop_blinking();
+    turn_led_on(off_button);
+    flash_error_code(on_button, error_id);
+    flash_pause(flash_long_pause_ms);
+    flash_error_code(on_button, extra);
+    return true;
 }
 
 static void event_error(event_error_id error_id, int extra, char *file, int line) {

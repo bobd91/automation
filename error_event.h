@@ -22,12 +22,12 @@ enum error_event_id {
 }
 
 typedef enum error_event_id error_event_id;
-typedef void (* error_event_listener)(error_event_id event_id, int extra, char *file, int line);
+typedef bool (* error_event_listener)(error_event_id event_id, int extra, char *file, int line);
 
-#define error_event_if(test, ret, id, extra) \
+#define error_if(test, ret, id, extra) \
 do { \
   if(test) { \
-    error_event_send((id), (extra), __FILE__, __LINE__);
+    error_event_send((id), (extra), __FILE__, __LINE__); \
     return ret; \
   } \
 } while(0)
