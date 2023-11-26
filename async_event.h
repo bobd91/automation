@@ -15,7 +15,6 @@ enum async_event_id {
     ASYNC_EVENT_TURNED_ON,
     ASYNC_EVENT_SENSOR_THRESHOLD,
     ASYNC_EVENT_SENSOR_VALUE,
-    ASYNC_EVENT_ERROR,
     ASYNC_EVENT_MAX_ID // Placeholder, ensure that this is always last
 }
 

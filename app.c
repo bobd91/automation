@@ -9,10 +9,10 @@
 static void app_init(void) {
     async_init();
     async_event_init();
-    wifi_init(WIFI_SSID, WIFI_PASSWORD);
-    server_init(SERVER_ADDRESS, SERVER_PORT);
     control_panel_init();
     switch_action_init();
+    wifi_init(WIFI_SSID, WIFI_PASSWORD);
+    server_init(SERVER_ADDRESS, SERVER_PORT);
 }
 
 void app_run(void) {

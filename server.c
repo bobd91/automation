@@ -33,7 +33,7 @@ static err_t poll(void *arg, struct tcp_pcb *tpcb) {
 }
 
 static void error(void *arg, err_t err) {
-    error_event("LWIP error: %d", err);
+    error_if(true,, ERROR_EVENT_TCP_ERROR, err);
 }
 
 static err_t received(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err) {
@@ -42,9 +42,9 @@ static err_t received(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err
     cyw43_arch_lwip_check();
     if(p) {
         if(p->tot_len) {
-            error_if(p->tot_len >= BUF_SIZE, ERR_BUF, "TCP receive buffer overflow");
+            error_if(p->tot_len >= BUF_SIZE, ERR_BUF, ERROR_EVENT_BUFFER_OVERFLOW, 0);
             state->buffer_len = pbuf_copy_partial(p, state->buffer, p->tot_len, 0);
-            error_if(state->buffer_len != p->tot_len, ERR_BUF, "TCP receive buffer copy error");
+            error_if(state->buffer_len != p->tot_len, ERR_BUF, ERROR_EVENT_BUFFER_COPY, 0);
             tcp_recved(tpcb, p->tot_len);
         }
         pbuf_free(p);
@@ -64,10 +64,10 @@ static void process_buffer(tcp_state_t *state) {
 
 void server_connect(char *server_ip, char *server_port) {
     int ok = ip4addr_aton(server_ip, &tcp_state.remote_addr);
-    error_if(!ok,, "Invalid IP address: %s", server_ip);
+    error_if(!ok,, ERROR_EVENT_IP_ADDRESS, 0)
     
     int port = atoi(server_port);
-    error_if(!port,, "Invalid port number: %s", server_port);
+    error_if(!port,, ERROR_EVENT_IP_PORT, 0);
 
     tcp_state.tcp_pcb = tcp_new_ip_type(IP_GET_TYPE(tcp_state.remote_addr));
 
@@ -80,7 +80,7 @@ void server_connect(char *server_ip, char *server_port) {
     err_t err = tcp_connect(tcp_state.tcp_pcb, &state.remote_addr, server_port, connected);
     cyw42_arch_lwip_end();
 
-    error_if(err != ERR_OK,, "Server connection failed: %d", err);
+    error_if(err != ERR_OK,, ERROR_EVENT_TCP_CONNECT, err);
 
     return;
 }
@@ -120,14 +120,14 @@ void server_send_sensor_value(char *value) {
 
 bool server_send(const char *data, bool is_last) {
     err_t err = tcp_write(tcp_state.tcp_pcb, data, strlen(data), is_last ? 0 : TCP_WRITE_FLAG_MORE);
-    error_if(err != ERR_OK, false, "TCP write error: %d", err);
+    error_if(err != ERR_OK, false, ERROR_EVENT_TCP_WRITE, err);
 
     if(!is_last) {
         err = tcp_write(rcp_state.tcp_pcb, " ", 1, TCP_WRITE_FLAG_MORE);
-        error_if(err != ERR_OK, false, "TCP write error: %d", err);
+        error_if(err != ERR_OK, false, ERROR_EVENT_TCP_WRITE, err);
     } else {
         err = tcp_output(tcp_state.tcp_pcb);
-        error_if(err != ERR_OK, false, "TCP output error: %d", err);
+        error_if(err != ERR_OK, false, ERROR_EVENT_TCP_OUTPUT, err);
     }
 
     return true;

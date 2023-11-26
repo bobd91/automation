@@ -67,7 +67,7 @@ static void stop_blinking(void) {
 
 static void start_blinking(repeating_timer_callback_t matcher, led_button_info *led_button, uint32_t ms) {
     turn_all_leds_off();
-    error_if(!add_repeating_timer_ms(ms, matcher, led_button, &blink_timer),,"Failed to add reeating timer");
+    error_if(!add_repeating_timer_ms(ms, matcher, led_button, &blink_timer),, ERROR_EVENT_ADD_TIMER, 0);
 }
 
 static bool toggle_only_led(repeating_timer_t *blink_timer) {
@@ -172,10 +172,10 @@ static void event_auto_turn_on(void) {
     }
 }
 
-static void event_error(char *arg) {
+static void event_error(event_error_id error_id, int extra, char *file, int line) {
     is_running = false;
     auto_mode = false;
-    turn_all_leds_on();
+    error_leds(error_id, extra);
 }
 
 void control_panel_add_off_button(gpiopin button_pin, gpiopin led_pin) {
@@ -192,11 +192,11 @@ void control_panel_add_on_button(gpiopin button_pin, gpiopin led_pin) {
 
 void control_panel_init(uint32_t ms) {
     blink_interval_ms = ms;
+    error_event_listen(event_error);
     async_event_listen(ASYNC_EVENT_START, event_started);
     async_event_listen(ASYNC_EVENT_SERVER_CONNECTED, event_connected);
     async_event_listen(ASYNC_EVENT_IDENTIFY, event_identify);
     async_event_listen(ASYNC_EVENT_RUN, event_running);
     async_event_listen(ASYNC_EVENT_AUTO_TURN_OFF, event_auto_turn_off);
     async_event_listen(ASYNC_EVENT_AUTO_TURN_ON, event_auto_turn_on);
-    async_event_listen_arg(ASYNC_EVENT_ERROR, event_error);
 }

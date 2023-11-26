@@ -26,7 +26,7 @@ bool led_button_toggle(led_button_info *led_button) {
 
 led_button_info *led_button_new(gpiopin button_pin, gpiopin led_pin, led_button_event button_pressed) {
     led_button_info *info = malloc(sizeof(led_button_info));
-    halt_if(!info);
+    error_if(!info, NULL, ERROR_EVENT_NO_MEMORY, 0);
 
     info->button_pin = button_pin;
     info->led_pin = led_pin;

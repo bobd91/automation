@@ -1,25 +1,19 @@
 #include <stdio.h>
-#include <stdarg.h>
 #include "error_event.h"
 #include "async_event.h"
 
-#define BUF_SIZE 1024; // way too big
-static char *err = "Failed to format error message";
+static const int MAX_LISTENERS = 10;
+static error_event_listener listeners[MAX_LISTENERS];
+static int next_listener = 0;
 
-void error_event(const char *fmt, ...) {
-    va_list argp;
-    va_start(argp, fmt);    
-    char *buf = malloc(BUF_SIZE);
-
-    if(buf) {
-        int size = vsnprintf(buf, BUF_SIZE, fmt, argp);
-
-        if(!size) {
-            strncpy(buf, err, BUF_SIZE);
-        }
+void error_event_send(error_event_id id, int extra, char *file, int line) {
+    printf("Error event id=%d, extra=%d, in file %s, line %d", id, extra, file, line);
+    for(int i = 0 ; i < next_listener ; i++) {
+        *listeners[i](id, extra, file, line);
     }
+}
 
-    va_end(argp);
-
-    async_event_send_arg(ASYNC_EVENT_ERROR, buf);
+void error_event_listen(error_event_listener listener) {
+    error_if(next_listener == MAX_LISTENERS,, ERROR_EVENT_MAX_LISTENERS, 0);
+    listeners[next_listener++] = listener;
 }

@@ -1,7 +1,7 @@
 #include "gpio_controller.h"
 #include "gpio_switch.h"
 #include "control_panel.h"
-#include "async_event.h"
+#include "app.h"
 
 void main(void) {
     gpio_switch_setpin(SWITCH_PIN);

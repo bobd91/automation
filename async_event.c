@@ -42,22 +42,12 @@ void async_event_init(void) {
 static void enqueue_event(async_event_id event_id, char *arg) {
     if(queue_push(event_id, arg)) {
         async_set_work_pending(event_worker);
-    } else {
-        // If the queue has this many events then something has gone very wrong!
-        // Remove all events and enqueue an error event
-        queue_reset();
-        enqueue_event(ASYNC_EVENT_ERROR, async_event_copy_arg("Async Event Queue overflow"));
     }
-}
-
-static void queue_reset() {
-    queue_head = 0;
-    queue_tail = -1;
 }
 
 static event_info *queue_push(async_event_id event_id, char *arg) {
     queue_tail++;
-    if(queue_is_full()) return NULL;
+    error_if(queue_is_full(), NULL, ERROR_EVENT_ASYNC_QUEUE_FULL, 0);
     event_info *event = event_queue + queue_tail;
     event->event_id = id;
     event->arg = arg;
@@ -108,7 +98,7 @@ static void process_worker(async_when_pending_worker_t worker) {
 
 static void add_listener(async_event_id event_id, async_event_listener listener, async_event_listener_arg listener_arg) {
     listener_info *info = malloc(sizeof(listener_info));
-    error_if(!info,,"Malloc failed");
+    error_if(!info,, ERROR_EVENT_NO_MEMORY, 0);
     if(listener) {
         info->listener = listener;
         info->with_arg = false;
@@ -134,11 +124,6 @@ void async_event_listen(async_event_id event_id, async_event_listener listener) 
 
 void async_event_listen_arg(async_event_id event_id, async_event_listener_arg listener_arg) {
     add_listener(event_id, NULL, listener_arg);
-}
-
-void async_event_error(char *arg) {
-    led_button_state_error();
-    printf(event->arg);    
 }
 
 char *async_event_copy_arg(char *arg) {
