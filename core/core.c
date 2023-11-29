@@ -14,19 +14,23 @@ static void core_init(void) {
     switch_action_init();
     wifi_init(WIFI_SSID, WIFI_PASSWORD);
     server_init(SERVER_ADDRESS, SERVER_PORT);
-
-    // Initialisation complete, we now handle errors asynchronously
-    error_event_async_init();
 }
 
 void core_run(void) {
+    // Some components need to set up before we tell everyone to start
     core_init();
 
+    // Init is on main thread so errors can be handled directly
+i   // Now errors could happen in ISRs and are handled async
+    // (log them when they happen, handle them in the main loop)
+    error_event_async_init();
+
+    // Tell everyone to start
     async_event_send(ASYNC_EVENT_START);
 
     while(true) {
         async_poll();
-        error_event_handle();
+        error_event_async_check();
         async_wait_for_work();
     }
 }

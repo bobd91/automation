@@ -1,6 +1,5 @@
-
-#ifndef _GPIOPIN_H
-#define _GPIOPIN_H
+#ifndef GPIOPIN_H__
+#define GPIOPIN_H__
 
 #inlcude "hardware/gpio.h"
 

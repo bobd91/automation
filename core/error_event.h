@@ -1,5 +1,5 @@
-#ifndef _ERROR_EVENT_H
-#define _ERROR_EVENT_H
+#ifndef ERROR_EVENT_H__
+#define ERROR_EVENT_H__
 
 enum error_event_id {
   ERROR_EVENT_ASYNC_POLL_INIT = 1,

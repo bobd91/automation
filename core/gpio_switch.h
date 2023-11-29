@@ -1,5 +1,5 @@
-#ifndef _GPIO_SWITCH_H
-#define _GPIO_SWITCH_H
+#ifndef GPIO_SWITCH_H__
+#define GPIO_SWITCH_H__
 
 #include "gpiopin.h"
 

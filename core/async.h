@@ -1,5 +1,5 @@
-#ifndef _ASYNC_H
-#define _ASYNC_H
+#ifndef ASYNC_H__
+#define ASYNC_H__
 
 #include "pico/async_context.h"
 

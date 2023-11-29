@@ -1,5 +1,5 @@
-#ifndef _ASYNC_EVENT_H
-#define _ASYNC_EVENT_H
+#ifndef ASYNC_EVENT_H__
+#define ASYNC_EVENT_H__
 
 enum async_event_id {
     ASYNC_EVENT_START,

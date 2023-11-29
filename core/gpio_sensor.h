@@ -1,5 +1,5 @@
-#ifndef _GPIO_SENSOR_H
-#define _GPIO_SENSOR_H
+#ifndef GPIO_SENSOR_H__
+#define GPIO_SENSOR_H__
 
 #include "gpiopin.h"
 

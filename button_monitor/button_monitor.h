@@ -1,5 +1,5 @@
-#ifndef _BUTTON_MONITOR_H
-#define _BUTTON_MONITOR_H
+#ifndef BUTTON_MONITOR_H__
+#define BUTTON_MONITOR_H__
 
 #include "gpiopin.h"
 

@@ -1,5 +1,5 @@
-#ifndef _SWITCH_ACTION_H
-#define _SWITCH_ACTION_H
+#ifndef SWITCH_ACTION_H__
+#define SWITCH_ACTION_H__
 
 #include "async_event.h"
 

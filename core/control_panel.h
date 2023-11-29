@@ -1,5 +1,5 @@
-#ifndef _CONTROL_PANEL_H
-#define _CONTROL_PANEL_H
+#ifndef CONTROL_PANEL_H__
+#define CONTROL_PANEL_H__
 
 #include "gpiopin.h"
 

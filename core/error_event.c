@@ -33,6 +33,30 @@ static void sleep_or_reboot(void) {
     }
 }
 
+static error_event_listener *call_listener(error_event_listener *listener) {
+    if(listener) {
+        bool repeat = *listener(the_error);
+        return repeat ? listener : NULL;
+    }
+    return NULL;
+}
+
+static void error_event_handle() {
+    assert(the_error);
+
+    while(true) {
+        for(int i = 0 ; i < MAX_LISTENERS ; i++) {
+            listeners[i] = call_listener(listeners[i]);
+        }
+        sleep_or_reboot();
+    }
+}
+
+void error_event_listen(error_event_listener listener) {
+    error_if(next_listener == MAX_LISTENERS,, ERROR_EVENT_MAX_LISTENERS, 0);
+    listeners[next_listener++] = listener;
+}
+
 void error_event_async_init(void) {
     is_async_init = true;
 }
@@ -53,24 +77,7 @@ void error_event_log(error_event_id event_id, int err, char *file, int line) {
     if(!is_async_init) error_event_handle();
 }
 
-// If there is an error to handle then this function never returns
-void error_event_handle(void) {
-    if(!the_error) return;
-
-    while(true) {
-        for(int i = 0 ; i < MAX_LISTENERS ; i++) {
-            error_event_listener listener = listeners[i];
-            if(listener) {
-                bool repeat = *listener(&the_error);
-                if(!repeat) listeners[i] = NULL;
-            }
-        }
-        sleep_or_reboot();
-    }
+// If there an error has been logged then this function never returns
+void error_event_async_check(void) {
+    if(the_error) error_event_handle();
 }
-
-void error_event_listen(error_event_listener listener) {
-    error_if(next_listener == MAX_LISTENERS,, ERROR_EVENT_MAX_LISTENERS, 0);
-    listeners[next_listener++] = listener;
-}
-

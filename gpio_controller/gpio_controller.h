@@ -1,5 +1,5 @@
-#ifndef _GPIO_CONTROLLER_H
-#define _GPIO_CONTROLLER_H
+#ifndef GPIO_CONTROLLER_H__
+#define GPIO_CONTROLLER_H__
 
 #include "gpiopin.h"
 

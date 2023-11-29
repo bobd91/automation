@@ -1,5 +1,5 @@
-#ifndef _SERVER_COMMAND_H
-#define _SERVER_COMMAND_H
+#ifndef SERVER_COMMAND_H__
+#define SERVER_COMMAND_H__
 
 void server_command_dispatch(char *buf);
 

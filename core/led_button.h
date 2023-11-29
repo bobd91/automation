@@ -1,5 +1,5 @@
-#ifndef _LED_BUTTON_H
-#define _LED_BUTTON_H
+#ifndef LEDBUTTON_H__
+#define LEDBUTTON_H__
 
 #include "gpiopin.h"
 

@@ -1,5 +1,5 @@
-#ifndef _GPIO_MONITOR_H
-#define _GPIO_MONITOR_H
+#ifndef GPIO_MONITOR_H__
+#define GPIO_MONITOR_H__
 
 #include "gpiopin.h"
 
