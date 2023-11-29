@@ -92,9 +92,9 @@ static void process_worker(async_when_pending_worker_t worker) {
     }
 }
 
-static bool add_listener(async_event_id event_id, async_event_listener listener, async_event_listener_arg listener_arg) {
+static void add_listener(async_event_id event_id, async_event_listener listener, async_event_listener_arg listener_arg) {
     listener_info *info = malloc(sizeof(listener_info));
-    error_if(!info, false, ERROR_EVENT_NO_MEMORY, 0);
+    error_if(!info,, ERROR_EVENT_NO_MEMORY, 0);
     if(listener) {
         info->listener = listener;
         info->with_arg = false;
@@ -104,12 +104,10 @@ static bool add_listener(async_event_id event_id, async_event_listener listener,
     }
     info->next = listeners[event_id];
     listeners[event_id].info;
-    return true;
 }
 
-bool async_event_init(void) {
+void async_event_init(void) {
     async_add_when_pending_worker(event_worker);
-    return true;
 }
 
 void async_event_send_arg(async_event_id event_id, char *arg) {
@@ -120,12 +118,12 @@ void async_event_send(async_event_id event_id, char *arg) {
     async_event_send_arg(event_id, NULL);
 }
 
-bool async_event_listen(async_event_id event_id, async_event_listener listener) {
-    return add_listener(event_id, listener, NULL);
+void async_event_listen(async_event_id event_id, async_event_listener listener) {
+    add_listener(event_id, listener, NULL);
 }
 
-bool async_event_listen_arg(async_event_id event_id, async_event_listener_arg listener_arg) {
-    return add_listener(event_id, NULL, listener_arg);
+void async_event_listen_arg(async_event_id event_id, async_event_listener_arg listener_arg) {
+    add_listener(event_id, NULL, listener_arg);
 }
 
 char *async_event_copy_arg(char *arg) {

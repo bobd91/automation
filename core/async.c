@@ -6,10 +6,9 @@ static async_context_poll_t poll_context;
 static async_context_t *context;
 static const uint32_t poll_loop_ms = 1000 * 60;
 
-bool async_init(void) {
-    error_if(!async_context_poll_init_with_defaults(&poll_context), false, ERROR_EVENT_ASYNC_POLL_INIT, 0);
+void async_init(void) {
+    error_if(!async_context_poll_init_with_defaults(&poll_context),, ERROR_EVENT_ASYNC_POLL_INIT, 0);
     context = &poll_context.core;
-    return true;
 }
 
 async_context_t *async_get_context(void) {

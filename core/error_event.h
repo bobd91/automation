@@ -23,7 +23,7 @@ enum error_event_id {
 
 struct error_event_info {
   error_event_id event_id,
-  int extra,
+  int err,
   char *file,
   int line
 };
@@ -32,7 +32,7 @@ typedef enum error_event_id error_event_id;
 typedef struct error_event_info error_event_info;
 typedef bool (* error_event_listener)(error_event_info *event_info);
 
-#define error_if(test, ret, id, extra) \
+#define error_if(test, ret, id, err) \
 do { \
   if(test) { \
     error_event_log((id), (extra), __FILE__, __LINE__); \
@@ -40,8 +40,9 @@ do { \
   } \
 } while(0)
 
+void error_event_async_mode();
 void error_event_handle();
-void error_event_log(error_event_id event_id, int extra, char *file, int line);
+void error_event_call(error_event_id event_id, int err, char *file, int line);
 bool error_event_listen(error_event_listener listener);
 
 #endif

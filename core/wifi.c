@@ -36,9 +36,9 @@ static void wifi_connect(void) {
     error_if(!add_repeating_timer_ms(1000, check_link, NULL, &link_timer),, ERROR_EVENT_ADD_TIMER, 0);
 } 
 
-bool wifi_init(char *ssid, char *password) {
+void wifi_init(char *ssid, char *password) {
     wifi_ssid = ssid;
     wifi_password = password;
 
-    return async_event_listen(ASYNC_EVENT_START, wifi_connect);
+    async_event_listen(ASYNC_EVENT_START, wifi_connect);
 }

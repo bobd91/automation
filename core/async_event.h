@@ -22,10 +22,10 @@ typedef enum async_event_id async_event_id;
 typedef void (* async_event_listener)(void);
 typedef void (* async_event_listener_arg)(char *arg);
 
-bool async_event_init(void);
+void async_event_init(void);
 void async_event_send(async_event_id event_id);
 void async_event_send_arg(async_event_id event_id, char *arg);
-bool async_event_listen(async_event_id event_id, async_event_listener listener);
-bool async_event_listen_arg(async_event_id event_id, async_event_listen_arg listener);
+void async_event_listen(async_event_id event_id, async_event_listener listener);
+void async_event_listen_arg(async_event_id event_id, async_event_listen_arg listener);
 
 #endif

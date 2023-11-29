@@ -244,12 +244,12 @@ void control_panel_add_on_button(gpiopin button_pin, gpiopin led_pin) {
     on_button = &button;
 }
 
-bool control_panel_init(void) {
-    return error_event_listen(event_error)
-    && async_event_listen(ASYNC_EVENT_START, event_started)
-    && async_event_listen(ASYNC_EVENT_SERVER_CONNECTED, event_connected)
-    && async_event_listen(ASYNC_EVENT_IDENTIFY, event_identify)
-    && async_event_listen(ASYNC_EVENT_RUN, event_running)
-    && async_event_listen(ASYNC_EVENT_AUTO_TURN_OFF, event_auto_turn_off)
-    && async_event_listen(ASYNC_EVENT_AUTO_TURN_ON, event_auto_turn_on);
+void control_panel_init(void) {
+    error_event_listen(event_error)
+    async_event_listen(ASYNC_EVENT_START, event_started);
+    async_event_listen(ASYNC_EVENT_SERVER_CONNECTED, event_connected);
+    async_event_listen(ASYNC_EVENT_IDENTIFY, event_identify);
+    async_event_listen(ASYNC_EVENT_RUN, event_running);
+    async_event_listen(ASYNC_EVENT_AUTO_TURN_OFF, event_auto_turn_off);
+    async_event_listen(ASYNC_EVENT_AUTO_TURN_ON, event_auto_turn_on);
 }

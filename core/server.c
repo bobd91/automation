@@ -125,13 +125,13 @@ static bool server_send(const char *data, bool is_last) {
     return true;
 }
 
-bool server_init(char *ip, char *port) {
+void server_init(char *ip, char *port) {
     server_ip = ip;
     server_port = port;
 
-    return async_event_listen(ASYNC_EVENT_WIFI_CONNECTED, server_connect)
-    && async_event_listen(ASYNC_EVENT_SERVER_CONNECTED, server_send_identify)
-    && async_event_listen(ASYNC_EVENT_TURNED_OFF, server_send_turned_off)
-    && async_event_listen(ASYNC_EVENT_TURNED_ON, server_send_turned_on)
-    && async_event_listen_arg(ASYNC_EVENT_SENSOR_VALUE, server_send_sensor_value);
+    async_event_listen(ASYNC_EVENT_WIFI_CONNECTED, server_connect);
+    async_event_listen(ASYNC_EVENT_SERVER_CONNECTED, server_send_identify);
+    async_event_listen(ASYNC_EVENT_TURNED_OFF, server_send_turned_off);
+    async_event_listen(ASYNC_EVENT_TURNED_ON, server_send_turned_on);
+    async_event_listen_arg(ASYNC_EVENT_SENSOR_VALUE, server_send_sensor_value);
 }
