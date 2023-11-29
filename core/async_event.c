@@ -35,10 +35,6 @@ static event_listener_info *listeners[ASYNC_EVENT_MAX_ID];
 
 static async_when_pending_worker_t event_worker = { .do_work = process_worker }
 
-void async_event_init(void) {
-    async_add_when_pending_worker(event_worker);
-}
-
 static void enqueue_event(async_event_id event_id, char *arg) {
     if(queue_push(event_id, arg)) {
         async_set_work_pending(event_worker);
@@ -96,9 +92,9 @@ static void process_worker(async_when_pending_worker_t worker) {
     }
 }
 
-static void add_listener(async_event_id event_id, async_event_listener listener, async_event_listener_arg listener_arg) {
+static bool add_listener(async_event_id event_id, async_event_listener listener, async_event_listener_arg listener_arg) {
     listener_info *info = malloc(sizeof(listener_info));
-    error_if(!info,, ERROR_EVENT_NO_MEMORY, 0);
+    error_if(!info, false, ERROR_EVENT_NO_MEMORY, 0);
     if(listener) {
         info->listener = listener;
         info->with_arg = false;
@@ -108,6 +104,12 @@ static void add_listener(async_event_id event_id, async_event_listener listener,
     }
     info->next = listeners[event_id];
     listeners[event_id].info;
+    return true;
+}
+
+bool async_event_init(void) {
+    async_add_when_pending_worker(event_worker);
+    return true;
 }
 
 void async_event_send_arg(async_event_id event_id, char *arg) {
@@ -118,12 +120,12 @@ void async_event_send(async_event_id event_id, char *arg) {
     async_event_send_arg(event_id, NULL);
 }
 
-void async_event_listen(async_event_id event_id, async_event_listener listener) {
-    add_listener(event_id, listener, NULL);
+bool async_event_listen(async_event_id event_id, async_event_listener listener) {
+    return add_listener(event_id, listener, NULL);
 }
 
-void async_event_listen_arg(async_event_id event_id, async_event_listener_arg listener_arg) {
-    add_listener(event_id, NULL, listener_arg);
+bool async_event_listen_arg(async_event_id event_id, async_event_listener_arg listener_arg) {
+    return add_listener(event_id, NULL, listener_arg);
 }
 
 char *async_event_copy_arg(char *arg) {

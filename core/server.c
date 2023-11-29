@@ -14,6 +14,9 @@ struct tcp_state{
 
 static struct tcp_state tcp_state;
 
+static char* server_ip;
+static char *server_port;
+
 static err_t sent(void *arg, struct tcp_pcb *tpcb, u16_t len) {
     return ERR_OK;
 }
@@ -62,7 +65,7 @@ static void process_buffer(tcp_state_t *state) {
     command_dispatch(state->buffer);
 }
 
-void server_connect(char *server_ip, char *server_port) {
+static void server_connect() {
     int ok = ip4addr_aton(server_ip, &tcp_state.remote_addr);
     error_if(!ok,, ERROR_EVENT_IP_ADDRESS, 0)
     
@@ -91,34 +94,23 @@ static void server_send_arg(server_command cmd, char *arg) {
     }
 }
 
-void server_init(char *ip, char *port) {
-    server_ip = ip;
-    server_port = port;
-
-    async_event_listen(ASYNC_EVENT_WIFI_CONNECTED, server_connect);
-    async_event_listen(ASYNC_EVENT_SERVER_CONNECTED, server_send_identify);
-    async_event_listen(ASYNC_EVENT_TURNED_OFF, server_send_turned_off);
-    async_event_listen(ASYNC_EVENT_TURNED_ON, server_send_turned_on);
-    async_event_listen_arg(ASYNC_EVENT_SENSOR_VALUE, server_send_sensor_value);
-}
-
-void server_send_identify(void) {
+static void server_send_identify(void) {
     server_send_arg(SERVER_COMMAND_IDENTIFY, id_string());
 }
 
-void server_send_turned_off(void) {
+static void server_send_turned_off(void) {
     server_send(SERVER_COMMAND_TURNED_OFF, true);
 }
 
-void server_send_turned_on(void) {
+static void server_send_turned_on(void) {
     server_send(SERVER_COMMAND_TURNED_ON, true);
 }
 
-void server_send_sensor_value(char *value) {
+static void server_send_sensor_value(char *value) {
     server_send_arg(SERVER_COMMAND_SENSOR_VALUE, value);
 }
 
-bool server_send(const char *data, bool is_last) {
+static bool server_send(const char *data, bool is_last) {
     err_t err = tcp_write(tcp_state.tcp_pcb, data, strlen(data), is_last ? 0 : TCP_WRITE_FLAG_MORE);
     error_if(err != ERR_OK, false, ERROR_EVENT_TCP_WRITE, err);
 
@@ -131,4 +123,15 @@ bool server_send(const char *data, bool is_last) {
     }
 
     return true;
+}
+
+bool server_init(char *ip, char *port) {
+    server_ip = ip;
+    server_port = port;
+
+    return async_event_listen(ASYNC_EVENT_WIFI_CONNECTED, server_connect)
+    && async_event_listen(ASYNC_EVENT_SERVER_CONNECTED, server_send_identify)
+    && async_event_listen(ASYNC_EVENT_TURNED_OFF, server_send_turned_off)
+    && async_event_listen(ASYNC_EVENT_TURNED_ON, server_send_turned_on)
+    && async_event_listen_arg(ASYNC_EVENT_SENSOR_VALUE, server_send_sensor_value);
 }

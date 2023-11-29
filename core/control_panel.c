@@ -14,12 +14,12 @@ static led_button_info *off_button;
 static led_button_info *auto_button;
 static led_button_info *on_button;
 
-static uint32_t blink_interval_ms;
+static uint32_t blink_interval_ms 1000;
 static bool auto_mode;
 static bool is_running;
 
-static const uint32_t flash_pause_ms = 120;
-static const uint32_t flash_long_pause_ms = 3 * flash_pause_ms;
+static const uint32_t flash_short_ms = 120;
+static const uint32_t flash_long_ms = 3 * flash_short_ms;
 
 
 static led_button_info *next_led_button(led_button_info *led_button) {
@@ -182,20 +182,34 @@ static uint32_t highest_set_bit(uint32_t num) {
     return hsb;
 }
 
-static void flash_led(led_button_info *led_button, uint32_t pause_ms) {
+static void flash_led(led_button_info *led_button, uint32_t flash_ms) {
     turn_led_on(led_button);
-    sleep_ms(pause_ms);
+    flash_pause(flash_ms);
     turn_led_off(led_button);
+    flash_pause(flash_short_ms);
+}
+
+static void flash_pause(uint32_t pause_ms) {
+    sleep_ms(pause_ms);
 }
 
 static void flash_error_code(led_button_info *led_button, int error_code) {
-    // Don't want to be flashing negative numbers!
-    uint32_t code = (error_code >= 0) ? error_code : -error_code;
+    uint32_t code; 
 
+    // Negative numbers are flashed as 'dot' then absolute value
+    if(error_code < 0) {
+        code = -error_code;
+        flash_led(led_button, flash_short_ms);
+    } else {
+        code = error_code;
+    }
+
+    // Numbers are flashed as 'dash' for bit set, 'dot' for bit not set
+    // Staring with the highest set bit 
+    // Therefore all numbers (except 0) will start with a 'dash'
     uint32_t hsb = highest_set_bit(code);
     do {
-        flash_led(led_button, (code & hsb) ? flash_long_pause_ms : flash_pause_ms);
-        sleep_ms(flash_pause_ms);
+        flash_led(led_button, (code & hsb) ? flash_long_ms : flash_short_ms);
     } while(hsb /= 2);
 }
 
@@ -203,7 +217,7 @@ static bool error_leds(event_error_id error_id, int extra) {
     stop_blinking();
     turn_led_on(off_button);
     flash_error_code(on_button, error_id);
-    flash_pause(flash_long_pause_ms);
+    flash_pause(flash_long_ms);
     flash_error_code(on_button, extra);
     return true;
 }
@@ -215,24 +229,27 @@ static void event_error(event_error_id error_id, int extra, char *file, int line
 }
 
 void control_panel_add_off_button(gpiopin button_pin, gpiopin led_pin) {
-    off_button = led_button_new(button_pin, led_pin, off_button_pressed);
+    static led_button_info button = led_button_new(button_pin, led_pin, off_button_pressed);
+    off_button = &button;
+
 }
 
 void control_panel_add_auto_button(gpiopin button_pin, gpiopin led_pin) {
-    auto_button = led_button_new(button_pin, led_pin, auto_button_pressed);
+    static led_button_info button = led_button_new(button_pin, led_pin, auto_button_pressed);
+    auto_button = &button;
 }
 
 void control_panel_add_on_button(gpiopin button_pin, gpiopin led_pin) {
-    on_button = led_button_new(button_pin, led_pin, on_button_pressed);
+    static led_button_info button = led_button_new(button_pin, led_pin, on_button_pressed);
+    on_button = &button;
 }
 
-void control_panel_init(uint32_t ms) {
-    blink_interval_ms = ms;
-    error_event_listen(event_error);
-    async_event_listen(ASYNC_EVENT_START, event_started);
-    async_event_listen(ASYNC_EVENT_SERVER_CONNECTED, event_connected);
-    async_event_listen(ASYNC_EVENT_IDENTIFY, event_identify);
-    async_event_listen(ASYNC_EVENT_RUN, event_running);
-    async_event_listen(ASYNC_EVENT_AUTO_TURN_OFF, event_auto_turn_off);
-    async_event_listen(ASYNC_EVENT_AUTO_TURN_ON, event_auto_turn_on);
+bool control_panel_init(void) {
+    return error_event_listen(event_error)
+    && async_event_listen(ASYNC_EVENT_START, event_started)
+    && async_event_listen(ASYNC_EVENT_SERVER_CONNECTED, event_connected)
+    && async_event_listen(ASYNC_EVENT_IDENTIFY, event_identify)
+    && async_event_listen(ASYNC_EVENT_RUN, event_running)
+    && async_event_listen(ASYNC_EVENT_AUTO_TURN_OFF, event_auto_turn_off)
+    && async_event_listen(ASYNC_EVENT_AUTO_TURN_ON, event_auto_turn_on);
 }

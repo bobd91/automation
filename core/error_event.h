@@ -21,18 +21,27 @@ enum error_event_id {
   ERROR_EVENT_MAX_LISTENERS
 }
 
+struct error_event_info {
+  error_event_id event_id,
+  int extra,
+  char *file,
+  int line
+};
+
 typedef enum error_event_id error_event_id;
-typedef bool (* error_event_listener)(error_event_id event_id, int extra, char *file, int line);
+typedef struct error_event_info error_event_info;
+typedef bool (* error_event_listener)(error_event_info *event_info);
 
 #define error_if(test, ret, id, extra) \
 do { \
   if(test) { \
-    error_event_send((id), (extra), __FILE__, __LINE__); \
+    error_event_log((id), (extra), __FILE__, __LINE__); \
     return ret; \
   } \
 } while(0)
 
-void error_event_send(error_event_id event_id, int extra, char *file, int line);
-void error_event_listen(error_event_listener listener);
+void error_event_handle();
+void error_event_log(error_event_id event_id, int extra, char *file, int line);
+bool error_event_listen(error_event_listener listener);
 
 #endif

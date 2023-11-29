@@ -17,7 +17,7 @@ void switch_action_register(async_event_listener turn_off, async_event_listener 
     when_turn_on = turn_on;
 }
 
-void switch_action_init(void) {
-    async_event_add_listener(ASYNC_EVENT_TURN_OFF, when_turn_off);
-    async_event_add_listener(ASYNC_EVENT_TURN_ON, when_turn_on);
+bool switch_action_init(void) {
+    return async_event_listen(ASYNC_EVENT_TURN_OFF, when_turn_off)
+    && async_event_listen(ASYNC_EVENT_TURN_ON, when_turn_on);
 }
