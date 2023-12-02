@@ -1,6 +1,8 @@
 #ifndef ERROR_EVENT_H__
 #define ERROR_EVENT_H__
 
+#include <stdbool.h>
+
 enum error_event_id {
   ERROR_EVENT_ASYNC_POLL_INIT = 1,
   ERROR_EVENT_ASYNC_ADD_WORKER,
@@ -19,30 +21,31 @@ enum error_event_id {
   ERROR_EVENT_TCP_ERROR,
   ERROR_EVENT_TCP_LINK,
   ERROR_EVENT_MAX_LISTENERS
-}
-
-struct error_event_info {
-  error_event_id event_id,
-  int err,
-  char *file,
-  int line
 };
 
 typedef enum error_event_id error_event_id;
+
+struct error_event_info {
+  enum error_event_id event_id;
+  int err;
+  char *file;
+  int line;
+};
+
 typedef struct error_event_info error_event_info;
-typedef bool (* error_event_listener)(error_event_info *event_info);
+typedef bool (*error_event_listener)(error_event_info *event_info);
 
 #define error_if(test, ret, id, err) \
 do { \
   if(test) { \
-    error_event_log((id), (extra), __FILE__, __LINE__); \
+    error_event_log((id), (err), __FILE__, __LINE__); \
     return ret; \
   } \
 } while(0)
 
-void error_event_async_mode();
-void error_event_handle();
-void error_event_call(error_event_id event_id, int err, char *file, int line);
-bool error_event_listen(error_event_listener listener);
+void error_event_async_init();
+void error_event_async_check();
+void error_event_log(error_event_id event_id, int err, char *file, int line);
+void error_event_listen(error_event_listener listener);
 
 #endif

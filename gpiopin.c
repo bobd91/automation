@@ -1,14 +1,26 @@
 #include "gpiopin.h"
 #include "hardware/gpio.h"
 
-static struct callback_info {
-    gpiopin_callback rise,
-    gpiopin_callback fall,
-    bool enabled
+struct callback_info {
+    gpiopin_callback rise;
+    gpiopin_callback fall;
+    bool enabled;
 };
 
-static const uint GPIOPIN_MAX = GPIOPIN_28;
-static const struct callback_info[1 + GPIOPIN_MAX] callback_infos;
+#define GPIOPIN_MAX GPIOPIN_28
+
+static struct callback_info callback_infos[1 + GPIOPIN_MAX];
+
+static void irq_callback(uint gpio, uint32_t event_mask) {
+    struct callback_info callback = callback_infos[gpio];
+    if(callback.enabled) {
+        if(callback.rise && event_mask & GPIO_IRQ_EDGE_RISE) {
+            (*callback.rise)();
+        } else if (callback.fall && event_mask & GPIO_IRQ_EDGE_FALL) {
+            (*callback.fall)();
+        }
+    }
+}
 
 static void set_gpio_irq_callback(void) {
     static bool done;
@@ -18,22 +30,11 @@ static void set_gpio_irq_callback(void) {
     done = true;
 }
 
-static void irq_callback(uint gpio, uint32_t event_mask) {
-    callback_info callback = callback_infos[gpio];
-    if(callback.enabled) {
-        if(callback.rise && event_mask & GPIO_IRQ_EDGE_RISE) {
-            *callback.rise();
-        } else if (callback.fall && event_mask & GPIO_IRQ_EDGE_FALL) {
-            *callback.fall();
-        }
-    }
-}
-
 void gpiopin_set_in_enabled(gpiopin gpiopin, bool enabled) {
     callback_infos[gpiopin].enabled = enabled;
 }
 
-void gpiopin_set_in(gpiopin gpiopin, gpiopin_callback rise, gpiopin_callback_fall) {
+void gpiopin_set_in(gpiopin gpiopin, gpiopin_callback rise, gpiopin_callback fall) {
     callback_infos[gpiopin].rise = rise;
     callback_infos[gpiopin].fall = fall;
     gpio_init(gpiopin);

@@ -1,17 +1,18 @@
 #include <stdio.h>
+#include <stdbool.h>
 #include "error_event.h"
 #include "pico/time.h"
 #include "hardware/watchdog.h"
 
 static error_event_info *the_error;
-static bool print_error(error_event_id event_id, int err, char *file, int line);
+static bool print_error(error_event_info *event_info);
 
-static const int MAX_LISTENERS = 10;
+#define MAX_LISTENERS 10
 static error_event_listener listeners[MAX_LISTENERS] = { print_error };
 static int next_listener = 1;
 
 static const uint32_t error_sleep_ms = 5000;
-static const uint32_t error_reboot_ms = 60 * error_sleep_ms;
+static uint32_t error_reboot_ms = 60 * error_sleep_ms;
 
 static bool is_async_init;
 
@@ -33,9 +34,9 @@ static void sleep_or_reboot(void) {
     }
 }
 
-static error_event_listener *call_listener(error_event_listener *listener) {
+static error_event_listener call_listener(error_event_listener listener) {
     if(listener) {
-        bool repeat = *listener(the_error);
+        bool repeat = (*listener)(the_error);
         return repeat ? listener : NULL;
     }
     return NULL;
@@ -66,12 +67,10 @@ void error_event_async_init(void) {
 void error_event_log(error_event_id event_id, int err, char *file, int line) {
     static error_event_info event_info;
     if(the_error) return;  // only capture first error
-    event_info = {
-        .event_id = event_id,
-        .err = err,
-        .file = file,
-        .line = line
-    };
+    event_info.event_id = event_id;
+    event_info.err = err;
+    event_info.file = file;
+    event_info.line = line;
     the_error = &event_info;
 
     if(!is_async_init) error_event_handle();

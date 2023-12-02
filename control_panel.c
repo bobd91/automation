@@ -2,6 +2,7 @@
 #include "pico/time.h"
 #include "led_button.h"
 #include "async_event.h"
+#include "error_event.h"
 
 static repeating_timer_t blink_timer;
 
@@ -14,13 +15,12 @@ static led_button_info *off_button;
 static led_button_info *auto_button;
 static led_button_info *on_button;
 
-static uint32_t blink_interval_ms 1000;
+static uint32_t blink_interval_ms = 1000;
 static bool auto_mode;
 static bool is_running;
 
 static const uint32_t flash_short_ms = 120;
 static const uint32_t flash_long_ms = 3 * flash_short_ms;
-
 
 static led_button_info *next_led_button(led_button_info *led_button) {
     if(led_button == off_button) {
@@ -33,15 +33,15 @@ static led_button_info *next_led_button(led_button_info *led_button) {
 }
 
 static void with_all_buttons(led_button_action action) {
-    *action(off_button);
-    if(auto_button) *action(auto_button);
-    *action(on_button);
+    (*action)(off_button);
+    if(auto_button) (*action)(auto_button);
+    (*action)(on_button);
 }
 
 static void turn_led_on_only(led_button_info *led_button) {
     led_button_set(off_button, led_button == off_button);
     if(auto_button) led_button_set(auto_button, led_button == auto_button);
-    led_button_set(on_button, led_buton == on_button);    
+    led_button_set(on_button, led_button == on_button);    
 }
 
 static void turn_led_off(led_button_info *led_button) {
@@ -50,6 +50,10 @@ static void turn_led_off(led_button_info *led_button) {
 
 static void turn_led_on(led_button_info *led_button) {
     led_button_set(led_button, true);    
+}
+
+static void toggle_led(led_button_info *led_button) {
+    led_button_toggle(led_button);
 }
 
 static void turn_all_leds_off(void) {
@@ -70,21 +74,21 @@ static void start_blinking(repeating_timer_callback_t matcher, led_button_info *
     error_if(!add_repeating_timer_ms(ms, matcher, led_button, &blink_timer),, ERROR_EVENT_ADD_TIMER, 0);
 }
 
-static bool toggle_only_led(repeating_timer_t *blink_timer) {
-    led_button_info *led_button = blink_timer->user_data;
+static bool toggle_only_led(repeating_timer_t *timer) {
+    led_button_info *led_button = timer->user_data;
     led_button_toggle(led_button);
     return true;
 }
 
-static bool toggle_all_leds(repeatimg_timer_t *blink_timer) {
-    with_all_buttons(led_button_toggle);
+static bool toggle_all_leds(repeating_timer_t *timer) {
+    with_all_buttons(toggle_led);
     return true;
 }
 
-static bool toggle_next_led(repeating_timer_t *blink_timer) {
-    led_button_info *led_button = blink_timer->user_data;
-    if(!led_button_toggle(button)) {
-        blink_timer->user_data = next_led_button(led_button);
+static bool toggle_next_led(repeating_timer_t *timer) {
+    led_button_info *led_button = timer->user_data;
+    if(!led_button_toggle(led_button)) {
+        timer->user_data = next_led_button(led_button);
     }
     return true;
 }
@@ -93,7 +97,7 @@ static void led_set_all(bool on) {
     stop_blinking();
     // All leds are now off, so to turn them on just toggle
     if(on) {
-        with_all_buttons(led_button_toggle);     
+        with_all_buttons(toggle_led);     
     }
 }
 
@@ -121,24 +125,24 @@ static void led_blink_loop(void) {
     start_blinking(toggle_next_led, off_button, blink_interval_ms);
 }
 
-static void off_button_pressed(led_button_info *led_button) {
+static void off_button_pressed() {
     if(is_running) {
-        led_on_only(off_button);
+        turn_led_on_only(off_button);
         auto_mode = false;
         async_event_send(ASYNC_EVENT_TURN_OFF);
     }
 }
 
-static void auto_button_pressed(led_button_info *led_button) {
+static void auto_button_pressed() {
     if(is_running) {
-        led_button_on_only(auto_button);
+        turn_led_on_only(auto_button);
         auto_mode = true;
     }
 }
 
-static void on_button_pressed(led_button_info *led_button) {
+static void on_button_pressed() {
     if(is_running) {
-        led_button_on_only(on_button);
+        turn_led_on_only(on_button);
         auto_mode = false;
         async_event_send(ASYNC_EVENT_TURN_ON);
     }
@@ -182,15 +186,15 @@ static uint32_t highest_set_bit(uint32_t num) {
     return hsb;
 }
 
+static void flash_pause(uint32_t pause_ms) {
+    sleep_ms(pause_ms);
+}
+
 static void flash_led(led_button_info *led_button, uint32_t flash_ms) {
     turn_led_on(led_button);
     flash_pause(flash_ms);
     turn_led_off(led_button);
     flash_pause(flash_short_ms);
-}
-
-static void flash_pause(uint32_t pause_ms) {
-    sleep_ms(pause_ms);
 }
 
 static void flash_error_code(led_button_info *led_button, int error_code) {
@@ -213,39 +217,42 @@ static void flash_error_code(led_button_info *led_button, int error_code) {
     } while(hsb /= 2);
 }
 
-static bool error_leds(event_error_id error_id, int extra) {
+static bool error_leds(error_event_id error_id, int err) {
     stop_blinking();
     turn_led_on(off_button);
     flash_error_code(on_button, error_id);
     flash_pause(flash_long_ms);
-    flash_error_code(on_button, extra);
+    flash_error_code(on_button, err);
     return true;
 }
 
-static void event_error(event_error_id error_id, int extra, char *file, int line) {
+static bool event_error(error_event_info *event_info) {
     is_running = false;
     auto_mode = false;
-    error_leds(error_id, extra);
+    return error_leds(event_info->event_id, event_info->err);
 }
 
 void control_panel_add_off_button(gpiopin button_pin, gpiopin led_pin) {
-    static led_button_info button = led_button_new(button_pin, led_pin, off_button_pressed);
+    static led_button_info button;
+    button = led_button_new(button_pin, led_pin, off_button_pressed);
     off_button = &button;
 
 }
 
 void control_panel_add_auto_button(gpiopin button_pin, gpiopin led_pin) {
-    static led_button_info button = led_button_new(button_pin, led_pin, auto_button_pressed);
+    static led_button_info button;
+    button = led_button_new(button_pin, led_pin, auto_button_pressed);
     auto_button = &button;
 }
 
 void control_panel_add_on_button(gpiopin button_pin, gpiopin led_pin) {
-    static led_button_info button = led_button_new(button_pin, led_pin, on_button_pressed);
+    static led_button_info button;
+    button = led_button_new(button_pin, led_pin, on_button_pressed);
     on_button = &button;
 }
 
 void control_panel_init(void) {
-    error_event_listen(event_error)
+    error_event_listen(event_error);
     async_event_listen(ASYNC_EVENT_START, event_started);
     async_event_listen(ASYNC_EVENT_SERVER_CONNECTED, event_connected);
     async_event_listen(ASYNC_EVENT_IDENTIFY, event_identify);

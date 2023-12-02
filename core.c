@@ -4,8 +4,8 @@
 #include "async_event.h"
 #include "wifi.h"
 #include "server.h"
-#include "control_panel"
-#include "switch_action"
+#include "control_panel.h"
+#include "switch_action.h"
 
 static void core_init(void) {
     async_init();
@@ -13,7 +13,7 @@ static void core_init(void) {
     control_panel_init();
     switch_action_init();
     wifi_init(WIFI_SSID, WIFI_PASSWORD);
-    server_init(SERVER_ADDRESS, SERVER_PORT);
+    server_init(SERVER_IP, SERVER_PORT);
 }
 
 void core_run(void) {
@@ -21,7 +21,7 @@ void core_run(void) {
     core_init();
 
     // Init is on main thread so errors can be handled directly
-i   // Now errors could happen in ISRs and are handled async
+    // Now errors could happen in ISRs and are handled async
     // (log them when they happen, handle them in the main loop)
     error_event_async_init();
 

@@ -1,6 +1,6 @@
-#include "async_poll.h"
+#include "async.h"
 #include "error_event.h"
-#include "pico/async_context.h"
+#include "pico/async_context_poll.h"
 
 static async_context_poll_t poll_context;
 static async_context_t *context;

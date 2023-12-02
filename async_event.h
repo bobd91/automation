@@ -15,17 +15,19 @@ enum async_event_id {
     ASYNC_EVENT_TURNED_ON,
     ASYNC_EVENT_SENSOR_THRESHOLD,
     ASYNC_EVENT_SENSOR_VALUE,
+    ASYNC_EVENT_SERVER_ERROR,
     ASYNC_EVENT_MAX_ID // Placeholder, ensure that this is always last
-}
+};
 
 typedef enum async_event_id async_event_id;
 typedef void (* async_event_listener)(void);
-typedef void (* async_event_listener_arg)(char *arg);
+typedef void (* async_event_listener_arg)(const char *arg);
 
 void async_event_init(void);
 void async_event_send(async_event_id event_id);
 void async_event_send_arg(async_event_id event_id, char *arg);
 void async_event_listen(async_event_id event_id, async_event_listener listener);
-void async_event_listen_arg(async_event_id event_id, async_event_listen_arg listener);
+void async_event_listen_arg(async_event_id event_id, async_event_listener_arg listener);
+char *async_event_format_arg(const char *format, ...);
 
 #endif

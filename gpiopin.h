@@ -1,7 +1,8 @@
 #ifndef GPIOPIN_H__
 #define GPIOPIN_H__
 
-#inlcude "hardware/gpio.h"
+#include <stdbool.h>
+#include "hardware/gpio.h"
 
 enum gpiopin {
     GPIOPIN_0, GPIOPIN_1, GPIOPIN_2, GPIOPIN_3, GPIOPIN_4,
