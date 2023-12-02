@@ -1,5 +1,5 @@
 #include "gpio_monitor.h"
-
+#include "gpio_sensor.h"
 #include "control_panel.h"
 #include "core.h"
 

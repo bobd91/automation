@@ -50,7 +50,7 @@ static char *null_if_empty(char *buf) {
     return (buf && buf[0]) ? buf : NULL;
 }
 
-void command_dispatch(char *buf) {
+void server_command_dispatch(char *buf) {
     const command *cmd = NULL;
 
     if(strlen(buf) >= COMMAND_SIZE) {
