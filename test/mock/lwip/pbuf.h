@@ -2,9 +2,10 @@
 #define MOCK_LWIP_PBUF_H__
 
 
-struct pbuf *p
+struct pbuf {
+    int tot_len;
+};
 
-p->tot_len
-state->buffer_len = pbuf_copy_partial(p, state->buffer, p->tot_len, 0);
+u16_t pbuf_copy_partial(const struct pbuf *buf, void *dataptr, u16_t len, u16_t offset);
 
 #endif

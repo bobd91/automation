@@ -8,6 +8,7 @@ typedef struct mock_async_context_poll async_context_poll_t;
 struct async_context_poll {
     async_context_t core;
 };
+
 bool async_context_poll_init_with_defaults(async_context_poll_t *self);
 
 #endif
