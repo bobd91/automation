@@ -145,6 +145,6 @@ char *async_event_format_arg(const char *format, ...) {
         return NULL;
     }
 
-    // allocated memory will be freed by process_worker
+    // allocated memory will be freed by process_worker()
     return ret;
 }

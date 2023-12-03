@@ -6,8 +6,10 @@
 #include "server.h"
 #include "control_panel.h"
 #include "switch_action.h"
+#include "pico/stdio.h"
 
 static void core_init(void) {
+    stdio_init_all();
     async_init();
     async_event_init();
     control_panel_init();

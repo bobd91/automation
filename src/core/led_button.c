@@ -1,6 +1,5 @@
 #include "led_button.h"
 #include "gpiopin.h"
-#include "memory.h"
 
 static bool led_button_is_on(led_button_info *led_button) {
     return gpiopin_get_out_level(led_button->led_pin);
