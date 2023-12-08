@@ -10,5 +10,6 @@ struct repeating_timer {
 };
 
 bool add_repeating_timer_ms(int32_t delay_ms, repeating_timer_callback_t callback, void *user_data, repeating_timer_t *out);
+void sleep_ms(uint32_t ms);
 
 #endif

@@ -33,6 +33,7 @@ static void process_buffer(lwip_state *state) {
 }
 
 static err_t sent(void *arg, struct tcp_pcb *tpcb, u16_t len) {
+    // We ignore the sent callback
     return ERR_OK;
 }
 
@@ -46,7 +47,7 @@ static err_t connected(void *arg, struct tcp_pcb *tpcb, err_t err) {
 }
 
 static err_t poll(void *arg, struct tcp_pcb *tpcb) {
-    // TODO: not sure what this is...
+    // We ignore the poll timer
     return ERR_OK;
 }
 

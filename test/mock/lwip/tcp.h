@@ -14,22 +14,33 @@ enum err_enum_t {
 
 typedef s8_t err_t;
 
+#define IP_ADDRESS_LEN 15;
+
 struct ip_addr {
-    u8_t type;
+    char ip_address[1 + IP_ADDRESS_LEN];
 };
 
 typedef struct ip_addr ip_addr_t;
 
 struct tcp_pcb {
-    ip_addr_t local_ip;
+    ip_addr_t ip;
+    int port;
+    void *arg;
+    tcp_connected_fn connected_fn;
+    bool connected;
+    tcp_err_fn err_fn;
+    err_t error;
+    tcp_recv_fn recv_fn;
+    struct pbuf *recv_pbuf;
 };
+
 typedef err_t(* tcp_connected_fn) (void *arg, struct tcp_pcb *tpcb, err_t err);
 typedef void(* tcp_err_fn) (void *arg, err_t err);
 typedef err_t(* tcp_poll_fn) (void *arg, struct tcp_pcb *tpcb);
 typedef err_t(* tcp_recv_fn) (void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err);
 typedef err_t(* tcp_sent_fn) (void *arg, struct tcp_pcb *tpcb, u16_t len);
 
-int ipaddr_aton(const char * cp, ip_addr_t *addr);
+int ipaddr_aton(const char *cp, ip_addr_t *addr);
 void tcp_recved(struct tcp_pcb *pcb, u16_t len);
 err_t tcp_connect(struct tcp_pcb *pcb, const ip_addr_t *ipaddr, u16_t port, tcp_connected_fn connected);
 struct tcp_pcb *tcp_new_ip_type(u8_t type);
@@ -40,5 +51,10 @@ void tcp_err(struct tcp_pcb *pcb, tcp_err_fn err);
 void tcp_poll(struct tcp_pcb *pcb, tcp_poll_fn poll, u8_t interval);
 err_t tcp_write(struct tcp_pcb *pcb, const void *arg, u16_t len, u8_t apiflags);
 err_t tcp_output(struct tcp_pcb *pcb);
+
+
+void mock_receive_data(const char *data);
+void mock_error(err_t error);
+void mock_call_pending_callbacks(void);
 
 #endif
