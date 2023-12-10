@@ -1,7 +1,4 @@
 #include "hardware/gpio.h"
-#include <mock.h>
-#include <stdbool.h>
-#include <assert.h>
 
 #define MIN_GPIO 0
 #define MAX_GPIO 28

@@ -1,14 +1,19 @@
 #ifndef MOCK_PICO_CYW43_ARCH_H__
 #define MOCK_PICO_CYW43_ARCH_H__
 
+#include "mock.h"
 #include "pico/async_context.h"
 
 struct mock_cyw43 {
-    viod * dummy;
+    int link_status;
+    async_context_t *context;
+    bool is_init;
+    int itf;
+
 };
 
 typedef struct mock_cyw43 cyw43_t;
-extern cyw43_t cyw43_state;
+cyw43_t cyw43_state;
 
 enum {
 CYW43_ITF_STA,  

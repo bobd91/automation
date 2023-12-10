@@ -1,12 +1,10 @@
 #include "lwip/tcp.h"
-#include "mock.h"
-#include <assert.h>
 
 static bool run_connected_fn, run_recv_fn, run_sent_fn;
 
 static struct tcp_pcb mock_tcp_pcb = { .error = ERR_OK };
 
-int ipaddr_aton(const char *cp, ip_addr_t *addr) {
+int ip4addr_aton(const char *cp, ip_addr_t *addr) {
     assert(cp);
     assert(addr);
     int len= strlen(cp);
@@ -34,7 +32,7 @@ err_t tcp_connect(struct tcp_pcb *pcb, const ip_addr_t *ipaddr, u16_t port, tcp_
     assert(65536 > port);
     MOCK_TRACE("pcb, %s, %u, connected_fn", ipaddr->ip_address, port);
 
-    pcb->ip = ipaddr;
+    pcb->ip = *ipaddr;
     pcb->port = port;
     pcb->connected_fn = connected;
     pcb->connected = false;
@@ -43,7 +41,7 @@ err_t tcp_connect(struct tcp_pcb *pcb, const ip_addr_t *ipaddr, u16_t port, tcp_
 }
 
 struct tcp_pcb *tcp_new_ip_type(u8_t type) {
-    assert(type == IP_ADDR_TYPE_V4);
+    assert(type == IPADDR_TYPE_V4);
     MOCK_TRACE("%u", type);
 
     return &mock_tcp_pcb;
@@ -96,22 +94,22 @@ err_t tcp_output(struct tcp_pcb *pcb) {
     return ERR_OK;
 }
 
-void mock_receive_data(const char *data) {
-    mock_tcp_pcb.recv_pbuf = mock_pbuf(data);
+void mock_tcp_receive_data(const char *data) {
+    mock_tcp_pcb.recv_pbuf = mock_pbuf_init(data);
 }
 
-void mock_error(err_t error) {
+void mock_tcp_error(err_t error) {
     mock_tcp_pcb.error = error;
 }
 
-void mock_call_pending_callbacks(void) {
+void mock_tcp_call_pending_callbacks(void) {
     struct tcp_pcb *pcb = &mock_tcp_pcb;
     if(pcb->connected_fn && !pcb->connected) {
         pcb->connected = true;
-        (*pcb.connected_fn)(pcb->arg, pcb, ERR_OK);
+        (*pcb->connected_fn)(pcb->arg, pcb, ERR_OK);
     }
     if(pcb->recv_fn && pcb->recv_pbuf && pcb->recv_pbuf->tot_len) {
-        (*pcb->recv_fn)(pcb->arg, pcb->pbuf, ERR_OK);
+        (*pcb->recv_fn)(pcb->arg, pcb, pcb->recv_pbuf, ERR_OK);
     }
     if(pcb->err_fn && pcb->error != ERR_OK)  {
         (*pcb->err_fn)(pcb->arg, pcb->error);

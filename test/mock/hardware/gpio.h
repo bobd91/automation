@@ -4,7 +4,9 @@
 #define GPIO_OUT 1
 #define GPIO_IN 0
 
-typedef void(* gpio_irq_callback_t) (uint gpio, uint32_t event_mask)
+#include "mock.h"
+
+typedef void(*gpio_irq_callback_t)(uint gpio, uint32_t event_mask);
 
 enum  gpio_irq_level { 
     GPIO_IRQ_LEVEL_LOW = 0x1u, 

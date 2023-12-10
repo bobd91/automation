@@ -3,7 +3,7 @@
 #include "error_event.h"
 #include "server_command.h"
 #include "unique_id.h"
-#include "pico/stdlib.h"
+//#include "pico/stdlib.h"
 #include "pico/cyw43_arch.h"
 #include "lwip/pbuf.h"
 #include "lwip/tcp.h"

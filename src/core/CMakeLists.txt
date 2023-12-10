@@ -31,7 +31,6 @@ if(NOT TARGET automation_core)
     )
 
     target_link_libraries(automation_core INTERFACE
-            pico_stdlib
             pico_time
             pico_unique_id
             pico_cyw43_arch_lwip_poll
