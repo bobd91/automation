@@ -41,7 +41,7 @@ struct tcp_pcb {
     tcp_err_fn err_fn;
     err_t error;
     tcp_recv_fn recv_fn;
-    struct pbuf *recv_pbuf;
+    struct pbuf *data_pbuf;
 };
 
 void tcp_recved(struct tcp_pcb *pcb, u16_t len);
@@ -56,7 +56,8 @@ err_t tcp_write(struct tcp_pcb *pcb, const void *arg, u16_t len, u8_t apiflags);
 err_t tcp_output(struct tcp_pcb *pcb);
 
 
-void mock_tcp_receive_data(const char *data);
+typedef err_t(*mock_tcp_server_recv_handler)(const char *data);
+void mock_tcp_server_sent(const char *data);
 void mock_tcp_error(err_t error);
 void mock_tcp_call_pending_callbacks(void);
 

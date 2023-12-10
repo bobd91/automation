@@ -13,7 +13,7 @@ struct mock_cyw43 {
 };
 
 typedef struct mock_cyw43 cyw43_t;
-cyw43_t cyw43_state;
+extern cyw43_t cyw43_state;
 
 enum {
 CYW43_ITF_STA,  

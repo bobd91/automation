@@ -59,7 +59,12 @@ static uint32_t run_timer(repeating_timer_t *timer) {
         set_run_time(timer);
     }
 
-    (*timer->callback)(timer);
+    bool repeat = (*timer->callback)(timer);
+
+    if(!repeat) {
+        remove_timer(timer);
+        return 0;
+    }
 
     if(set_run_time_at_start) {
         return until_run_ms(timer);
@@ -95,6 +100,8 @@ bool cancel_repeating_timer(repeating_timer_t *timer) {
 
 void sleep_ms(uint32_t ms) {
     MOCK_TRACE("%u", ms);
+
+    usleep(ms * 1000);
 }
 
 uint32_t mock_time_run_pending_timers(void) {
@@ -107,7 +114,9 @@ uint32_t mock_time_run_pending_timers(void) {
         if(!remaining_ms) {
             remaining_ms = run_timer(timer);
         }
-        min_wait_ms = (min_wait_ms && min_wait_ms < remaining_ms) ? min_wait_ms : remaining_ms;
+        if(remaining_ms) {
+            min_wait_ms = (min_wait_ms && min_wait_ms < remaining_ms) ? min_wait_ms : remaining_ms;
+        }
         timer = timer->next;
     }
 

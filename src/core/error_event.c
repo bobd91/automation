@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdbool.h>
 #include "error_event.h"
 #include "pico/time.h"
@@ -17,11 +18,11 @@ static uint32_t error_reboot_ms = 60 * error_sleep_ms;
 static bool is_async_init;
 
 static bool print_error(error_event_info *event_info) {
-    printf("Error event id=%d, err=%d, in file %s, line %d", 
+    printf("Error event id=%d, err=%d, in file %s, line %d\n", 
         event_info->event_id,
         event_info->err,
         event_info->file,
-        event_info-> line);
+        event_info->line);
     return false;
 }
 
@@ -31,6 +32,8 @@ static void sleep_or_reboot(void) {
         error_reboot_ms -= error_sleep_ms;
     } else {
         watchdog_enable(0, true);
+        // should never get here
+        exit(the_error->event_id);
     }
 }
 

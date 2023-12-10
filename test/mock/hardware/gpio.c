@@ -72,7 +72,7 @@ void gpio_set_irq_enabled(uint gpio, uint32_t event_mask, bool enabled) {
 }
 
 void gpio_set_irq_callback(gpio_irq_callback_t callback) {
-    MOCK_TRACE("%s", callback ? "*" : "NULL");
+    MOCK_TRACE("%s", callback ? "callback" : "NULL");
     irq_callback = callback;
 }
 

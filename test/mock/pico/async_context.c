@@ -80,7 +80,7 @@ void async_context_wait_for_work_ms(async_context_t *context, uint32_t ms) {
     uint32_t time_left_ms = ms;
     while(time_left_ms && !context->work_pending) {
         uint32_t wait_ms = mock_time_run_pending_timers();
-        mock_sleep_ms(wait_ms);
+        mock_sleep_ms(wait_ms ? wait_ms : 5000);
         time_left_ms = time_left_ms > wait_ms ? time_left_ms - wait_ms : 0;
     }
 }

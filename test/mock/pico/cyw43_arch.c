@@ -1,5 +1,7 @@
 #include "pico/cyw43_arch.h"
 
+cyw43_t cyw43_state;
+
 static bool lwip_begun;
 static int connect_link_status = CYW43_LINK_UP;
 
@@ -36,7 +38,7 @@ void cyw43_arch_enable_sta_mode(void) {
 
 int cyw43_arch_wifi_connect_async(const char *ssid, const char *pw, uint32_t auth) {
     assert(cyw43_state.is_init);
-    MOCK_TRACE("%s, %s, %u", ssid, pw, auth);
+    MOCK_TRACE("\"%s\", \"%s\", %u", ssid, pw, auth);
 
     cyw43_state.link_status = connect_link_status;
     return 0;

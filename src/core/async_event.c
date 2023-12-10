@@ -1,6 +1,7 @@
 #include "async_event.h"
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdarg.h>
 #include "pico/async_context.h"
 #include "async.h"
@@ -35,7 +36,7 @@ static void process_worker(async_context_t *context, async_when_pending_worker_t
 static async_when_pending_worker_t event_worker = { .do_work = process_worker };
 
 static bool queue_is_full() {
-    return QUEUE_SIZE > queue_tail + 1;
+    return QUEUE_SIZE <= queue_tail + 1;
 }
 
 static bool queue_is_empty() {
