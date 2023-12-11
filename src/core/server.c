@@ -23,7 +23,7 @@ typedef struct lwip_state lwip_state;
 static lwip_state tcp_state;
 
 static char* server_ip;
-static char *server_port;
+static int server_port;
 
 static void process_buffer(lwip_state *state) {
     // We expect a string in the buffer so add a trailing null (we left space for it)
@@ -79,8 +79,7 @@ static void server_connect() {
     int ok = ip4addr_aton(server_ip, &tcp_state.remote_addr);
     error_if(!ok,, ERROR_EVENT_IP_ADDRESS, 0);
     
-    int port = atoi(server_port);
-    error_if(!port,, ERROR_EVENT_IP_PORT, 0);
+    error_if(!server_port,, ERROR_EVENT_IP_PORT, 0);
 
     tcp_state.tcp_pcb = tcp_new_ip_type(IP_GET_TYPE(tcp_state.remote_addr));
 
@@ -90,7 +89,7 @@ static void server_connect() {
     tcp_recv(tcp_state.tcp_pcb, received);
     tcp_err(tcp_state.tcp_pcb, error);
     cyw43_arch_lwip_begin();
-    err_t err = tcp_connect(tcp_state.tcp_pcb, &tcp_state.remote_addr, port, connected);
+    err_t err = tcp_connect(tcp_state.tcp_pcb, &tcp_state.remote_addr, server_port, connected);
     cyw43_arch_lwip_end();
 
     error_if(err != ERR_OK,, ERROR_EVENT_TCP_CONNECT, err);
@@ -139,7 +138,7 @@ static void server_send_error_message(const char *error_message) {
     server_send_arg(SERVER_COMMAND_ERROR, error_message);
 }
 
-void server_init(char *ip, char *port) {
+void server_init(char *ip, int port) {
     server_ip = ip;
     server_port = port;
 

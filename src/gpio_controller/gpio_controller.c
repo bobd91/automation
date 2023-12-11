@@ -1,7 +1,8 @@
-#include "gpio_controller.h"
 #include "gpio_switch.h"
 #include "control_panel.h"
 #include "core.h"
+
+// Edit gpio_pins.cmake to change value of pins
 
 void main(void) {
     gpio_switch_setpin(SWITCH_PIN);

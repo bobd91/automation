@@ -15,12 +15,14 @@ static led_button_info *off_button;
 static led_button_info *auto_button;
 static led_button_info *on_button;
 
-static uint32_t blink_interval_ms = 1000;
+static uint32_t blink_interval_ms = CONTROL_PANEL_BLINK_INTERVAL_MS;
 static bool auto_mode;
 static bool is_running;
 
-static const uint32_t flash_short_ms = 120;
-static const uint32_t flash_long_ms = 3 * flash_short_ms;
+static const uint32_t flash_short_on_ms = CONTROL_PANEL_FLASH_SHORT_ON_MS;
+static const uint32_t flash_short_off_ms = CONTROL_PANEL_FLASH_SHORT_OFF_MS;
+static const uint32_t flash_long_on_ms = CONTROL_PANEL_FLASH_LONG_ON_MS;
+static const uint32_t flash_long_off_ms = CONTROL_PANEL_FLASH_LONG_OFF_MS;
 
 static led_button_info *next_led_button(led_button_info *led_button) {
     if(led_button == off_button) {
@@ -194,7 +196,7 @@ static void flash_led(led_button_info *led_button, uint32_t flash_ms) {
     turn_led_on(led_button);
     flash_pause(flash_ms);
     turn_led_off(led_button);
-    flash_pause(flash_short_ms);
+    flash_pause(flash_short_off_ms);
 }
 
 static void flash_error_code(led_button_info *led_button, int error_code) {
@@ -203,7 +205,7 @@ static void flash_error_code(led_button_info *led_button, int error_code) {
     // Negative numbers are flashed as 'dot' then absolute value
     if(error_code < 0) {
         code = -error_code;
-        flash_led(led_button, flash_short_ms);
+        flash_led(led_button, flash_short_on_ms);
     } else {
         code = error_code;
     }
@@ -213,7 +215,7 @@ static void flash_error_code(led_button_info *led_button, int error_code) {
     // Therefore all numbers (except 0) will start with a 'dash'
     uint32_t hsb = highest_set_bit(code);
     do {
-        flash_led(led_button, (code & hsb) ? flash_long_ms : flash_short_ms);
+        flash_led(led_button, (code & hsb) ? flash_long_on_ms : flash_short_on_ms);
     } while(hsb /= 2);
 }
 
@@ -221,7 +223,7 @@ static bool error_leds(error_event_id error_id, int err) {
     stop_blinking();
     turn_led_on(off_button);
     flash_error_code(on_button, error_id);
-    flash_pause(flash_long_ms);
+    flash_pause(flash_long_off_ms);
     flash_error_code(on_button, err);
     return true;
 }

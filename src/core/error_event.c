@@ -12,8 +12,8 @@ static bool print_error(error_event_info *event_info);
 static error_event_listener listeners[MAX_LISTENERS] = { print_error };
 static int next_listener = 1;
 
-static const uint32_t error_sleep_ms = 5000;
-static uint32_t error_reboot_ms = 60 * error_sleep_ms;
+static const uint32_t error_sleep_ms = ERROR_EVENT_SLEEP_MS;
+static uint32_t error_reboot_ms = ERROR_EVENT_REBOOT_MS;
 
 static bool is_async_init;
 

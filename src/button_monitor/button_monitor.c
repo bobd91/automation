@@ -1,6 +1,7 @@
-#include "button_monitor.h"
 #include "control_panel.h"
 #include "core.h"
+
+// Edit gpio_pins.cmake to change value of pins
 
 void main(void) {
     control_panel_add_off_button(OFF_BUTTON_PIN, OFF_LED_PIN);

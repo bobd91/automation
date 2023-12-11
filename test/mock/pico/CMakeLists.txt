@@ -1,0 +1,5 @@
+add_subdirectory(stdlib)
+add_subdirectory(stdio)
+add_subdirectory(time)
+add_subdirectory(unique_id)
+add_subdirectory(cyw43_arch_lwip_poll)

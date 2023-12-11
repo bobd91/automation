@@ -2,8 +2,6 @@
 #include "control_panel.h"
 #include "core.h"
 
-#include "gpio_monitor.h"
-
 void main(void) {
     gpio_sensor_setpin(SENSOR_PIN);
 

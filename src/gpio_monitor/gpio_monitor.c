@@ -1,7 +1,8 @@
-#include "gpio_monitor.h"
 #include "gpio_sensor.h"
 #include "control_panel.h"
 #include "core.h"
+
+// Edit gpio_pins.cmake to change value of pins
 
 void main(void) {
     gpio_sensor_setpin(SENSOR_PIN);
