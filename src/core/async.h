@@ -3,10 +3,6 @@
 
 #include "pico/async_context.h"
 
-#ifndef ASYNC_POLL_LOOP_MS
-#define ASYNC_POLL_LOOP_MS (1000 * 60)
-#endif
-
 void async_init(void);
 async_context_t *async_get_context(void);
 void async_add_when_pending_worker(async_when_pending_worker_t *worker);

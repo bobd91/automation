@@ -3,14 +3,6 @@
 
 #include <stdbool.h>
 
-#ifndef ERROR_EVENT_SLEEP_MS 
-#define ERROR_EVENT_SLEEP_MS 5000
-#endif
-
-#ifndef ERROR_EVENT_REBOOT_MS
-#define ERROR_EVENT_REBOOT_MS (60 * ERROR_EVENT_SLEEP_MS)
-#endif
-
 enum error_event_id {
   ERROR_EVENT_ASYNC_POLL_INIT = 1,
   ERROR_EVENT_ASYNC_ADD_WORKER,

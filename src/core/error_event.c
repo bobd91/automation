@@ -32,8 +32,6 @@ static void sleep_or_reboot(void) {
         error_reboot_ms -= error_sleep_ms;
     } else {
         watchdog_enable(0, true);
-        // should never get here
-        exit(the_error->event_id);
     }
 }
 
