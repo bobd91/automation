@@ -57,6 +57,7 @@ err_t tcp_output(struct tcp_pcb *pcb);
 
 
 typedef err_t(*mock_tcp_server_recv_handler)(const char *data);
+void mock_tcp_set_server_recv_handler(mock_tcp_server_recv_handler handler);
 void mock_tcp_server_sent(const char *data);
 void mock_tcp_error(err_t error);
 void mock_tcp_call_pending_callbacks(void);
