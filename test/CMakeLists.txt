@@ -20,6 +20,7 @@ add_subdirectory(core)
 create_test_sourcelist(Tests
         automation_tests.c
         test_send_idfy.c
+        test_recv_run.c
 )
 
 add_executable(automation_tests ${Tests})

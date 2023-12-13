@@ -95,3 +95,16 @@ void mock_gpio_set_in_level(uint gpio, bool value) {
     }
 
 }
+
+bool mock_gpio_get_out_level(uint gpio) {
+    assert(IS_VALID_GPIO(gpio));
+    assert(is_init[gpio]);
+    assert(is_set_dir[gpio]);
+    assert(is_out[gpio]);
+
+    return level_value[gpio];
+}
+
+bool mock_gpio_get_irq_enabled(uint gpio) {
+    return (bool)mask[gpio];
+}

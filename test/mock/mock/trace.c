@@ -7,9 +7,6 @@
 static char buffer[1 + BUFFER_SIZE];
 static mock_trace_match *matches;
 
-
-typedef void (* mock_trace_function)(const char *trace);
-
 static mock_trace_function trace_function;
 
 void mock_trace_print(const char *format, ...) {

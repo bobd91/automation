@@ -24,5 +24,7 @@ void gpio_set_irq_enabled (uint gpio, uint32_t event_mask, bool enabled);
 void gpio_set_irq_callback (gpio_irq_callback_t callback);
 
 void mock_gpio_set_in_level(uint gpio, bool value);
+bool mock_gpio_get_out_level (uint gpio);
+bool mock_gpio_get_irq_enabled(uint gpio);
 
 #endif

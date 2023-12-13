@@ -24,7 +24,6 @@ u16_t pbuf_copy_partial(const struct pbuf *buf, void *dataptr, u16_t len, u16_t 
 
 u8_t pbuf_free(struct pbuf *p) {
     assert(p == &mock_pbuf);
-    assert(0 < p->tot_len);
     MOCK_TRACE(PBUFP_FMT, p->tot_len, p->data);
 
     mock_pbuf_free();
