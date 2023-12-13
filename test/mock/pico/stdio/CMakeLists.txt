@@ -10,4 +10,8 @@ if(NOT TARGET pico_stdio)
             ${MOCK_INCLUDE_DIR}
     )
 
+    target_link_libraries(pico_stdio INTERFACE
+        mock_trace
+    )
+
 endif()

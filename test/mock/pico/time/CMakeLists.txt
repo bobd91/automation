@@ -10,4 +10,8 @@ if(NOT TARGET pico_time)
             ${MOCK_INCLUDE_DIR}
     )
 
+    target_link_libraries(pico_time INTERFACE
+        mock_trace
+    )
+
 endif()

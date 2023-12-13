@@ -10,4 +10,8 @@ if(NOT TARGET hardware_watchdog)
             ${MOCK_INCLUDE_DIR}
     )
 
+    target_link_libraries(hardware_watchdog INTERFACE
+        mock_trace
+    )
+
 endif()

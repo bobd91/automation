@@ -10,4 +10,8 @@ if(NOT TARGET pico_unique_id)
             ${MOCK_INCLUDE_DIR}
     )
 
+    target_link_libraries(pico_unique_id INTERFACE
+        mock_trace
+    )
+
 endif()

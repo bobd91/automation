@@ -14,4 +14,8 @@ if(NOT TARGET pico_cyw43_arch_lwip_poll)
             ${MOCK_INCLUDE_DIR}
     )
 
+    target_link_libraries(pico_cyw43_arch_lwip_poll INTERFACE
+        mock_trace
+    )
+
 endif()

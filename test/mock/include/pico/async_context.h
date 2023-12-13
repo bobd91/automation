@@ -1,7 +1,7 @@
 #ifndef PICO_ASYNC_CONTEXT_H__
 #define PICO_ASYNC_CONTEXT_H__
 
-#include "mock.h"
+#include "mock/trace.h"
 
 typedef struct mock_async_context async_context_t;
 typedef struct mock_async_when_pending_worker async_when_pending_worker_t;

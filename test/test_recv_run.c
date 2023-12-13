@@ -5,15 +5,14 @@
 
 static err_t handle_server_input(const char *data) {
     if(!strcmp(data, "IDFY MOCKBOARD1")) {
-        printf("Test Passed, exit(0)\n");
-        fflush(stdout);
-        exit(0);
-    } else {
-        printf("Received: \"%s\"\n", data);
-        printf("Test Failed, exit(1)\n");
-        fflush(stdout);
-        exit(1);
+        mock_trace_function_set(handle_mock_trace);
+        mock_tcp_server_sent("RUNN");
     }
+}
+
+static void handle_mock_trace(const char *output) {
+    if(strstr(output, ""))
+
 }
 
 int test_send_idfy(int argc, char *argv[]) {

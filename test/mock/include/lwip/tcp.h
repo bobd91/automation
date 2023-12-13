@@ -1,7 +1,7 @@
 #ifndef MOCK_LWIP_TCP_H__
 #define MOCK_LWIP_TCP_H__
 
-#include "mock.h"
+#include "mock/trace.h"
 #include "lwip/pbuf.h"
 
 #define IPADDR_TYPE_V4 0

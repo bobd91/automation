@@ -1,7 +1,8 @@
 #ifndef _MOCK_PICO_UNIQUE_ID_H__
 #define _MOCK_PICO_UNIQUE_ID_H__
 
-#include "mock.h"
+#include "mock/trace.h"
+#include "pico/types.h"
 
 #define PICO_UNIQUE_BOARD_ID_SIZE_BYTES 16
 

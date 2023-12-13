@@ -1,7 +1,7 @@
 #ifndef MOCK_PICO_CYW43_ARCH_H__
 #define MOCK_PICO_CYW43_ARCH_H__
 
-#include "mock.h"
+#include "mock/trace.h"
 #include "pico/async_context.h"
 
 struct mock_cyw43 {

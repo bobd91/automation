@@ -4,7 +4,7 @@
 #define GPIO_OUT 1
 #define GPIO_IN 0
 
-#include "mock.h"
+#include "mock/trace.h"
 
 typedef void(*gpio_irq_callback_t)(uint gpio, uint32_t event_mask);
 

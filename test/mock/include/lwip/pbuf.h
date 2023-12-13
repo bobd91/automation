@@ -3,7 +3,8 @@
 
 #define MOCK_PBUF_MAX_DATA 50
 
-#include "mock.h"
+#include "mock/trace.h"
+#include "lwip/arch.h"
 
 struct pbuf {
     int tot_len;

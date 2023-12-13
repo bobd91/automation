@@ -1,7 +1,7 @@
 #ifndef MOCK_PICO_TIME_H__
 #define MOCK_PICO_TIME_H__
 
-#include "mock.h"
+#include "mock/trace.h"
 #include <time.h>
 
 typedef struct mock_repeating_timer repeating_timer_t;
