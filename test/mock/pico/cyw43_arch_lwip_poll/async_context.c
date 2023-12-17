@@ -2,6 +2,8 @@
 #include "pico/time.h"
 #include "lwip/tcp.h"
 
+static mock_async_context_no_work_function no_work_function;
+
 static bool workers_has_worker(async_when_pending_worker_t *workers, async_when_pending_worker_t *worker) {
     while(workers && workers != worker) {
         workers = workers->next;
@@ -28,8 +30,7 @@ static void do_pending_work(async_when_pending_worker_t *workers) {
     }
 }
 
-static void mock_async_context_wait_sleep_ms(uint32_t ms) {
-    MOCK_TRACE("%u", ms);
+static void mock_sleep_ms(uint32_t ms) {
     usleep(1000 * ms);
 }
 
@@ -80,9 +81,15 @@ void async_context_wait_for_work_ms(async_context_t *context, uint32_t ms) {
 
     uint32_t time_left_ms = ms;
     while(time_left_ms && !context->work_pending) {
+        if(no_work_function) no_work_function();
         uint32_t wait_ms = mock_time_run_pending_timers();
-        mock_async_context_wait_sleep_ms(wait_ms ? wait_ms : 5000);
+        wait_ms = wait_ms ? wait_ms : time_left_ms;
+        mock_sleep_ms(wait_ms);
         time_left_ms = time_left_ms > wait_ms ? time_left_ms - wait_ms : 0;
     }
+}
+
+void mock_async_context_no_work_function_set(mock_async_context_no_work_function function) {
+    no_work_function = function;
 }
 

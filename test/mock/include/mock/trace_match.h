@@ -3,7 +3,7 @@
 
 #include <regex.h>
 
-typedef void (* mock_trace_function)(const char *trace);
+typedef void (* mock_trace_function)(const char *func, const char *trace);
 typedef struct mock_trace_match_info mock_trace_match;
 typedef void (* mock_trace_match_function)(const char *trace, mock_trace_match *match);
 
@@ -19,6 +19,6 @@ struct mock_trace_match_info {
 
 void mock_trace_function_set(mock_trace_function function);
 void mock_trace_match_add(mock_trace_match *match);
-void mock_trace_match_trace(const char *trace);
+void mock_trace_match_trace(const char *func, const char *trace);
 
 #endif

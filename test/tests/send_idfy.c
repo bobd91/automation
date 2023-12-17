@@ -5,18 +5,13 @@
 
 static err_t handle_server_input(const char *data) {
     if(!strcmp(data, "IDFY MOCKBOARD1")) {
-        printf("Test Passed, exit(0)\n");
-        fflush(stdout);
         exit(0);
     } else {
-        printf("Received: \"%s\"\n", data);
-        printf("Test Failed, exit(1)\n");
-        fflush(stdout);
         exit(1);
     }
 }
 
-int test_send_idfy(int argc, char *argv[]) {
+int send_idfy(int argc, char *argv[]) {
     gpio_sensor_setpin(SENSOR_PIN);
 
     control_panel_add_off_button(OFF_BUTTON_PIN, OFF_LED_PIN);

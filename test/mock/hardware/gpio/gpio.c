@@ -90,6 +90,7 @@ void mock_gpio_set_in_level(uint gpio, bool value) {
         event_mask |= value ? GPIO_IRQ_EDGE_RISE : GPIO_IRQ_EDGE_FALL;
     }
 
+    MOCK_TRACE("%u, %d, %d, %u, %p, %u", gpio, value, changed, event_mask, irq_callback, mask[gpio]);
     if(irq_callback && mask[gpio] & event_mask) {
         (*irq_callback)(gpio, event_mask);
     }

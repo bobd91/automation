@@ -29,6 +29,7 @@ static void set_gpio_irq_callback(void) {
 }
 
 void gpiopin_set_in_enabled(gpiopin gpiopin, bool enabled) {
+    set_gpio_irq_callback();
     gpio_set_irq_enabled(gpiopin, callback_infos[gpiopin].event_mask, enabled);
 }
 

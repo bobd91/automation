@@ -9,23 +9,26 @@ static mock_trace_match *matches;
 
 static mock_trace_function trace_function;
 
-void mock_trace_print(const char *format, ...) {
+void mock_trace_print(const char *func, const char *format, ...) {
     va_list va_print;
 
     va_start(va_print, format);
     vsnprintf(buffer, BUFFER_SIZE, format, va_print);
     va_end(va_print);
 
-    puts(buffer);
+    fputs(func, stdout);
+    putc('(', stdout);
+    fputs(buffer, stdout);
+    puts(")");
     
-    if(trace_function) (*trace_function)(buffer);
+    if(trace_function) (*trace_function)(func, buffer);
 }
 
 void mock_trace_function_set(mock_trace_function function) {
     trace_function = function;
 }
 
-void mock_trace_match_trace(const char *trace) {
+void mock_trace_match_trace(const char *func, const char *trace) {
     mock_trace_match *match = matches;
     while(match) {
         int fail = regexec(match->re, trace, match->nmatch, match->matchptr, match->eflags);

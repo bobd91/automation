@@ -9,8 +9,8 @@
 #include <unistd.h>
 #include <assert.h>
 
-#define MOCK_TRACE(format, ...) mock_trace_print("%s(" format ")", __func__ __VA_OPT__(,) __VA_ARGS__)
+#define MOCK_TRACE(format, ...) mock_trace_print(__func__, format __VA_OPT__(,) __VA_ARGS__)
 
-void mock_trace_print(const char *format, ...);
+void mock_trace_print(const char *func, const char *format, ...);
 
 #endif
