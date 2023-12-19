@@ -76,7 +76,7 @@ void gpio_set_irq_callback(gpio_irq_callback_t callback) {
     irq_callback = callback;
 }
 
-void mock_gpio_set_in_level(uint gpio, bool value) {
+void mock_gpio_set(uint gpio, bool value) {
     assert(IS_VALID_GPIO(gpio));
     assert(is_init[gpio]);
     assert(is_set_dir[gpio]);
@@ -97,7 +97,7 @@ void mock_gpio_set_in_level(uint gpio, bool value) {
 
 }
 
-bool mock_gpio_get_out_level(uint gpio) {
+bool mock_gpio_get(uint gpio) {
     assert(IS_VALID_GPIO(gpio));
     assert(is_init[gpio]);
     assert(is_set_dir[gpio]);
@@ -106,6 +106,6 @@ bool mock_gpio_get_out_level(uint gpio) {
     return level_value[gpio];
 }
 
-bool mock_gpio_get_irq_enabled(uint gpio) {
+bool mock_gpio_irq_enabled(uint gpio) {
     return (bool)mask[gpio];
 }

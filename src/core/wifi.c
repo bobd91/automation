@@ -34,7 +34,7 @@ static void wifi_connect(void) {
     err = cyw43_arch_wifi_connect_async(wifi_ssid, wifi_password, CYW43_AUTH_WPA2_AES_PSK);
     error_if(err,, ERROR_EVENT_WIFI_CONNECT, err);
 
-    error_if(!add_repeating_timer_ms(1000, check_link, NULL, &link_timer),, ERROR_EVENT_ADD_TIMER, 0);
+    error_if(!add_repeating_timer_ms(WIFI_LINK_CHECK_MS, check_link, NULL, &link_timer),, ERROR_EVENT_ADD_TIMER, 0);
 } 
 
 void wifi_init(char *ssid, char *password) {

@@ -21,6 +21,6 @@ bool add_repeating_timer_ms(int32_t delay_ms, repeating_timer_callback_t callbac
 bool cancel_repeating_timer(repeating_timer_t *timer);
 void sleep_ms(uint32_t ms);
 
-uint32_t mock_time_run_pending_timers(void);
+uint32_t mock_time_run_timers(void);
 
 #endif

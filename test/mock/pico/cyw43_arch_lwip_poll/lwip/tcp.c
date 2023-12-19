@@ -4,11 +4,11 @@ static bool run_connected_fn, run_recv_fn, run_sent_fn;
 
 static struct tcp_pcb mock_tcp_pcb = { .error = ERR_OK };
 
-static err_t default_server_recv_handler(const char *data);
+static err_t default_server_receiver(const char *data);
 
-static mock_tcp_server_recv_handler mock_server_recv_handler = default_server_recv_handler;
+static mock_tcp_server_receiver server_receiver = default_server_receiver;
 
-static err_t default_server_recv_handler(const char *data) {
+static err_t default_server_receiver(const char *data) {
     return ERR_OK;
 }
 
@@ -107,7 +107,7 @@ err_t tcp_output(struct tcp_pcb *pcb) {
     mock_pbuf_copy_partial(pcb->data_pbuf, &sent_buf, pcb->data_pbuf->tot_len, 0);
     mock_pbuf_free();
 
-    return (*mock_server_recv_handler)(sent_buf);
+    return (*server_receiver)(sent_buf);
 }
 
 void mock_tcp_server_sent(const char *data) {
@@ -115,15 +115,15 @@ void mock_tcp_server_sent(const char *data) {
     mock_pbuf_concat(data);
 }
 
-void mock_tcp_set_server_recv_handler(mock_tcp_server_recv_handler handler) {
-    mock_server_recv_handler = handler;
+void mock_tcp_server_received(mock_tcp_server_receiver receiver) {
+    server_receiver = receiver;
 }
 
 void mock_tcp_error(err_t error) {
     mock_tcp_pcb.error = error;
 }
 
-void mock_tcp_call_pending_callbacks(void) {
+void mock_tcp_do_callbacks(void) {
     struct tcp_pcb *pcb = &mock_tcp_pcb;
     if(pcb->connected_fn && !pcb->connected) {
         pcb->connected = true;

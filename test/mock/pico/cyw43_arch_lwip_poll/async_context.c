@@ -2,7 +2,7 @@
 #include "pico/time.h"
 #include "lwip/tcp.h"
 
-static mock_async_context_no_work_function no_work_function;
+static mock_async_context_when_idle when_idle;
 
 static bool workers_has_worker(async_when_pending_worker_t *workers, async_when_pending_worker_t *worker) {
     while(workers && workers != worker) {
@@ -71,7 +71,7 @@ void async_context_poll(async_context_t *context) {
     context->work_pending = false;
     do_pending_work(context->workers);
 
-    mock_tcp_call_pending_callbacks();
+    mock_tcp_do_callbacks();
 }
 
 void async_context_wait_for_work_ms(async_context_t *context, uint32_t ms) {
@@ -79,17 +79,19 @@ void async_context_wait_for_work_ms(async_context_t *context, uint32_t ms) {
     assert(context->is_init);
     MOCK_TRACE("context, %u", ms);
 
-    uint32_t time_left_ms = ms;
-    while(time_left_ms && !context->work_pending) {
-        if(no_work_function) no_work_function();
-        uint32_t wait_ms = mock_time_run_pending_timers();
+    int time_left_ms = ms;
+
+    while(time_left_ms > 0) {
+        uint32_t wait_ms = mock_time_run_timers();
+        if(context->work_pending) return;
         wait_ms = wait_ms ? wait_ms : time_left_ms;
         mock_sleep_ms(wait_ms);
-        time_left_ms = time_left_ms > wait_ms ? time_left_ms - wait_ms : 0;
+        time_left_ms -= wait_ms;
     }
+    if(when_idle) when_idle();
 }
 
-void mock_async_context_no_work_function_set(mock_async_context_no_work_function function) {
-    no_work_function = function;
+void mock_async_context_idle(mock_async_context_when_idle function) {
+    when_idle = function;
 }
 

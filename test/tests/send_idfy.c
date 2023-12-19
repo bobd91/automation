@@ -2,8 +2,9 @@
 #include "control_panel.h"
 #include "core.h"
 #include "lwip/tcp.h"
+#include "mock/when.h"
 
-static err_t handle_server_input(const char *data) {
+static err_t server_received(const char *data) {
     if(!strcmp(data, "IDFY MOCKBOARD1")) {
         exit(0);
     } else {
@@ -12,13 +13,10 @@ static err_t handle_server_input(const char *data) {
 }
 
 int send_idfy(int argc, char *argv[]) {
-    gpio_sensor_setpin(SENSOR_PIN);
 
-    control_panel_add_off_button(OFF_BUTTON_PIN, OFF_LED_PIN);
-    control_panel_add_auto_button(AUTO_BUTTON_PIN, AUTO_LED_PIN);
-    control_panel_add_on_button(ON_BUTTON_PIN, ON_LED_PIN);
+    mock_when_init_gpio_sensor();
 
-    mock_tcp_set_server_recv_handler(handle_server_input);
+    mock_tcp_server_received(server_received);
 
     core_run();
 }

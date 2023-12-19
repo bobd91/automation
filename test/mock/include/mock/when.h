@@ -9,6 +9,6 @@
 #define TONN "TONN"
 
 void mock_when_init_gpio_sensor(void);
-void mock_when_server(char *command, char *reply, mock_async_context_no_work_function complete);
+void mock_when_server(char *command, char *reply, mock_async_context_when_idle complete);
 
 #endif

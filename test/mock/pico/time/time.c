@@ -104,7 +104,7 @@ void sleep_ms(uint32_t ms) {
     usleep(ms * 1000);
 }
 
-uint32_t mock_time_run_pending_timers(void) {
+uint32_t mock_time_run_timers(void) {
     repeating_timer_t *timer = timers;
     uint32_t remaining_ms;
     uint32_t min_wait_ms = 0;

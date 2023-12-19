@@ -56,10 +56,10 @@ err_t tcp_write(struct tcp_pcb *pcb, const void *arg, u16_t len, u8_t apiflags);
 err_t tcp_output(struct tcp_pcb *pcb);
 
 
-typedef err_t(*mock_tcp_server_recv_handler)(const char *data);
-void mock_tcp_set_server_recv_handler(mock_tcp_server_recv_handler handler);
+typedef err_t(*mock_tcp_server_receiver)(const char *data);
+void mock_tcp_server_received(mock_tcp_server_receiver handler);
 void mock_tcp_server_sent(const char *data);
 void mock_tcp_error(err_t error);
-void mock_tcp_call_pending_callbacks(void);
+void mock_tcp_do_callbacks(void);
 
 #endif
