@@ -4,6 +4,7 @@ if(NOT TARGET mock_trace)
 
     target_sources(mock_trace INTERFACE
             trace.c
+            when.c
     )
 
     target_include_directories(mock_trace INTERFACE
